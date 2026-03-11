@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>File Name Generator</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f6f8;
+      color: #1f2937;
+    }
+    .wrap {
+      max-width: 760px;
+      margin: 40px auto;
+      background: #ffffff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    h1 {
+      margin: 0 0 12px;
+      font-size: 28px;
+    }
+    p.desc {
+      margin: 0 0 20px;
+      line-height: 1.6;
+      color: #4b5563;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 160px 1fr;
+      gap: 12px 16px;
+      align-items: center;
+    }
+    label {
+      font-weight: 600;
+    }
+    input, select {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+    }
+    .hint {
+      grid-column: 2 / 3;
+      color: #6b7280;
+      font-size: 14px;
+      margin-top: -6px;
+    }
+    .actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 18px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: #2563eb;
+      color: #ffffff;
+    }
+    .btn-secondary {
+      background: #111827;
+      color: #ffffff;
+    }
+    .result-box {
+      margin-top: 22px;
+      border: 1px solid #e5e7eb;
+      border-radius: 12px;
+      padding: 16px;
+      background: #f9fafb;
+    }
+    .result-title {
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .result {
+      font-family: Consolas, monospace;
+      font-size: 18px;
+      word-break: break-all;
+      color: #111827;
+    }
+    .status {
+      margin-top: 12px;
+      color: #2563eb;
+      font-weight: 600;
+      min-height: 24px;
+    }
+    .example {
+      margin-top: 18px;
+      color: #4b5563;
+      line-height: 1.7;
+    }
+    @media (max-width: 640px) {
+      .wrap { margin: 16px; padding: 18px; }
+      .grid { grid-template-columns: 1fr; }
+      .hint { grid-column: auto; margin-top: -4px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>โปรแกรมเปลี่ยนชื่อไฟล์</h1>
+    <p class="desc">
+      ใช้ชื่อต้นแบบ เช่น <b>M_John_20260311_Cloths_BC</b><br>
+      จากนั้นกรอกชื่อใหม่ วันที่ใหม่ และเลือกประเภท เพื่อให้ระบบแทนที่เฉพาะส่วนนั้นทันที
+    </p>
+
+    <div class="grid">
+      <label for="template">ชื่อต้นแบบ</label>
+      <input id="template" type="text" value="M_John_20260311_Cloths_BC" />
+
+      <label for="newName">ชื่อใหม่</label>
+      <input id="newName" type="text" placeholder="เช่น Mike" />
+
+      <label for="newDate">วันที่ใหม่</label>
+      <input id="newDate" type="text" placeholder="เช่น 20260320" />
+      <div class="hint">แนะนำรูปแบบวันที่: YYYYMMDD เช่น 20260311</div>
+
+      <label for="newType">ประเภท</label>
+      <select id="newType">
+        <option>Cloths</option>
+        <option>Pant</option>
+        <option>Shirt</option>
+        <option>Sock</option>
+        <option>Shoe</option>
+      </select>
+    </div>
+
+    <div class="actions">
+      <button class="btn-primary" onclick="updateResult()">สร้างชื่อไฟล์</button>
+      <button class="btn-secondary" onclick="copyResult()">คัดลอกผลลัพธ์</button>
+    </div>
+
+    <div class="result-box">
+      <div class="result-title">ผลลัพธ์</div>
+      <div id="result" class="result">M_John_20260311_Cloths_BC</div>
+      <div id="status" class="status"></div>
+    </div>
+
+    <div class="example">
+      ตัวอย่างผลลัพธ์: <br>
+      <b>M_Mike_20260320_Pant_BC</b>
+    </div>
+  </div>
+
+  <script>
+    function parseTemplate(text) {
+      const parts = text.trim().split('_');
+      if (parts.length < 5) return null;
+      return {
+        prefix: parts[0],
+        oldName: parts[1],
+        oldDate: parts[2],
+        oldType: parts[3],
+        suffix: parts[parts.length - 1]
+      };
+    }
+
+    function sanitizeName(value) {
+      return value.trim().replace(/\s+/g, '').replace(/[^A-Za-z0-9ก-๙_-]/g, '');
+    }
+
+    function sanitizeDate(value) {
+      return value.trim().replace(/[^0-9-]/g, '');
+    }
+
+    function updateResult() {
+      const template = document.getElementById('template').value;
+      const newName = document.getElementById('newName').value;
+      const newDate = document.getElementById('newDate').value;
+      const newType = document.getElementById('newType').value;
+      const resultEl = document.getElementById('result');
+      const statusEl = document.getElementById('status');
+
+      const parsed = parseTemplate(template);
+      if (!parsed) {
+        resultEl.textContent = 'รูปแบบชื่อต้นแบบไม่ถูกต้อง';
+        statusEl.textContent = 'ชื่อต้นแบบต้องมีอย่างน้อย 5 ส่วน เช่น M_John_20260311_Cloths_BC';
+        return;
+      }
+
+      const finalName = sanitizeName(newName) || parsed.oldName;
+      const finalDate = sanitizeDate(newDate) || parsed.oldDate;
+      const finalType = newType || parsed.oldType;
+
+      const result = `${parsed.prefix}_${finalName}_${finalDate}_${finalType}_${parsed.suffix}`;
+      resultEl.textContent = result;
+      statusEl.textContent = 'อัปเดตผลลัพธ์แล้ว';
+    }
+
+    async function copyResult() {
+      const text = document.getElementById('result').textContent.trim();
+      const statusEl = document.getElementById('status');
+
+      if (!text || text === 'รูปแบบชื่อต้นแบบไม่ถูกต้อง') {
+        statusEl.textContent = 'ยังไม่มีชื่อไฟล์ที่ถูกต้องให้คัดลอก';
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(text);
+        statusEl.textContent = 'คัดลอกชื่อไฟล์แล้ว';
+      } catch (err) {
+        statusEl.textContent = 'คัดลอกไม่สำเร็จ ลองกดสร้างชื่อไฟล์ก่อน';
+      }
+    }
+
+    document.getElementById('template').addEventListener('input', updateResult);
+    document.getElementById('newName').addEventListener('input', updateResult);
+    document.getElementById('newDate').addEventListener('input', updateResult);
+    document.getElementById('newType').addEventListener('change', updateResult);
+
+    updateResult();
+  </script>
+</body>
+</html>
