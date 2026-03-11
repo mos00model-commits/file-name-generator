@@ -168,131 +168,133 @@
   </div>
 
   <script>
-    const categories = ['Cloths', 'Pant', 'Shirt', 'Sock', 'Shoe'];
+    (function () {
+      const categories = ['Cloths', 'Pant', 'Shirt', 'Sock', 'Shoe'];
 
-    const mGroup = document.getElementById('mGroup');
-    const chGroup = document.getElementById('chGroup');
-    const tGroup = document.getElementById('tGroup');
+      const mGroup = document.getElementById('mGroup');
+      const chGroup = document.getElementById('chGroup');
+      const tGroup = document.getElementById('tGroup');
 
-    const baseNameEl = document.getElementById('baseName');
-    const dateTextEl = document.getElementById('dateText');
-    const tCategoryEl = document.getElementById('tCategory');
+      const baseNameEl = document.getElementById('baseName');
+      const dateTextEl = document.getElementById('dateText');
+      const tCategoryEl = document.getElementById('tCategory');
 
-    const currentData = {
-      M: [],
-      CH: [],
-      T: []
-    };
+      const currentData = {
+        M: [],
+        CH: [],
+        T: []
+      };
 
-    function buildData() {
-      const name = (baseNameEl.value || 'John').trim() || 'John';
-      const date = (dateTextEl.value || '031126').trim() || '031126';
-      const tCategory = tCategoryEl.value || 'Shirt';
+      function buildData() {
+        const name = (baseNameEl.value || 'John').trim() || 'John';
+        const date = (dateTextEl.value || '031126').trim() || '031126';
+        const tCategory = tCategoryEl.value || 'Shirt';
 
-      currentData.M = categories.map(function(cat) {
-        return 'M_' + name + '\n' + date + '_' + cat;
-      });
+        currentData.M = categories.map(function (cat) {
+          return 'M_' + name + '_' + '\n' + date + '_' + cat;
+        });
 
-      currentData.CH = categories.map(function(cat) {
-        return 'CH_' + name + '\n' + date + '_' + cat;
-      });
+        currentData.CH = categories.map(function (cat) {
+          return 'CH_' + name + '_' + '\n' + date + '_' + cat;
+        });
 
-      currentData.T = [
-        'T_' + name + '\n' + date + '_' + tCategory + '_BC',
-        'T_' + name + '\n' + date + '_' + tCategory + '_N',
-        'T_' + name + '\n' + date + '_' + tCategory + '_R',
-        'T_' + name + '\n' + date + '_' + tCategory + '_M'
-      ];
-    }
-
-    function copyText(text) {
-      if (navigator.clipboard && window.isSecureContext) {
-        return navigator.clipboard.writeText(text);
+        currentData.T = [
+          'T_' + name + '_' + '\n' + date + '_' + tCategory + '_BC',
+          'T_' + name + '_' + '\n' + date + '_' + tCategory + '_N',
+          'T_' + name + '_' + '\n' + date + '_' + tCategory + '_R',
+          'T_' + name + '_' + '\n' + date + '_' + tCategory + '_M'
+        ];
       }
 
-      return new Promise(function(resolve, reject) {
-        const textarea = document.createElement('textarea');
-        textarea.value = text;
-        textarea.setAttribute('readonly', '');
-        textarea.style.position = 'fixed';
-        textarea.style.opacity = '0';
-        textarea.style.pointerEvents = 'none';
-        document.body.appendChild(textarea);
-        textarea.focus();
-        textarea.select();
-
-        try {
-          const ok = document.execCommand('copy');
-          document.body.removeChild(textarea);
-          if (ok) {
-            resolve();
-          } else {
-            reject(new Error('copy failed'));
-          }
-        } catch (error) {
-          document.body.removeChild(textarea);
-          reject(error);
+      function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) {
+          return navigator.clipboard.writeText(text);
         }
-      });
-    }
 
-    function createCard(text) {
-      const card = document.createElement('div');
-      card.className = 'card';
+        return new Promise(function (resolve, reject) {
+          const textarea = document.createElement('textarea');
+          textarea.value = text;
+          textarea.setAttribute('readonly', 'readonly');
+          textarea.style.position = 'fixed';
+          textarea.style.opacity = '0';
+          textarea.style.pointerEvents = 'none';
+          document.body.appendChild(textarea);
+          textarea.focus();
+          textarea.select();
 
-      const top = document.createElement('div');
-      top.className = 'card-top';
-      top.textContent = text;
+          try {
+            const ok = document.execCommand('copy');
+            document.body.removeChild(textarea);
+            if (ok) {
+              resolve();
+            } else {
+              reject(new Error('copy failed'));
+            }
+          } catch (error) {
+            document.body.removeChild(textarea);
+            reject(error);
+          }
+        });
+      }
 
-      const sub = document.createElement('div');
-      sub.className = 'card-sub';
-      sub.textContent = 'คลิกเพื่อคัดลอกทันที';
+      function createCard(text) {
+        const card = document.createElement('div');
+        card.className = 'card';
 
-      card.appendChild(top);
-      card.appendChild(sub);
+        const top = document.createElement('div');
+        top.className = 'card-top';
+        top.textContent = text;
 
-      card.addEventListener('click', function() {
-        const copyValue = text.replace(/\n/g, '');
+        const sub = document.createElement('div');
+        sub.className = 'card-sub';
+        sub.textContent = 'คลิกเพื่อคัดลอกทันที';
 
-        copyText(copyValue)
-          .then(function() {
-            card.classList.add('copied');
-            sub.textContent = 'คัดลอกแล้ว';
-            setTimeout(function() {
-              card.classList.remove('copied');
-              sub.textContent = 'คลิกเพื่อคัดลอกทันที';
-            }, 900);
-          })
-          .catch(function() {
-            sub.textContent = 'คัดลอกไม่สำเร็จ';
-            setTimeout(function() {
-              sub.textContent = 'คลิกเพื่อคัดลอกทันที';
-            }, 1200);
-          });
-      });
+        card.appendChild(top);
+        card.appendChild(sub);
 
-      return card;
-    }
+        card.addEventListener('click', function () {
+          const copyValue = text.replace(/\n/g, '');
 
-    function renderGroup(container, list) {
-      container.innerHTML = '';
-      list.forEach(function(item) {
-        container.appendChild(createCard(item));
-      });
-    }
+          copyText(copyValue)
+            .then(function () {
+              card.classList.add('copied');
+              sub.textContent = 'คัดลอกแล้ว';
+              setTimeout(function () {
+                card.classList.remove('copied');
+                sub.textContent = 'คลิกเพื่อคัดลอกทันที';
+              }, 900);
+            })
+            .catch(function () {
+              sub.textContent = 'คัดลอกไม่สำเร็จ';
+              setTimeout(function () {
+                sub.textContent = 'คลิกเพื่อคัดลอกทันที';
+              }, 1200);
+            });
+        });
 
-    function render() {
-      buildData();
-      renderGroup(mGroup, currentData.M);
-      renderGroup(chGroup, currentData.CH);
-      renderGroup(tGroup, currentData.T);
-    }
+        return card;
+      }
 
-    baseNameEl.addEventListener('input', render);
-    dateTextEl.addEventListener('input', render);
-    tCategoryEl.addEventListener('change', render);
+      function renderGroup(container, list) {
+        container.innerHTML = '';
+        list.forEach(function (item) {
+          container.appendChild(createCard(item));
+        });
+      }
 
-    render();
+      function render() {
+        buildData();
+        renderGroup(mGroup, currentData.M);
+        renderGroup(chGroup, currentData.CH);
+        renderGroup(tGroup, currentData.T);
+      }
+
+      baseNameEl.addEventListener('input', render);
+      dateTextEl.addEventListener('input', render);
+      tCategoryEl.addEventListener('change', render);
+
+      render();
+    })();
   </script>
 </body>
 </html>
