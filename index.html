@@ -7,16 +7,17 @@
   <style>
     :root {
       --bg: #05070d;
-      --panel: #0b1220;
-      --panel-2: #111a2b;
-      --line: #22304a;
+      --input: #07163b;
+      --line: #3a67a0;
       --text: #f8fafc;
       --muted: #9fb0c8;
-      --accent: #3b82f6;
-      --card-red: #ff3b3b;
+      --red: #ff3b3b;
     }
 
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
       font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -42,7 +43,7 @@
 
     .topbar {
       display: grid;
-      grid-template-columns: 220px 220px 220px 1fr;
+      grid-template-columns: 220px 220px 220px;
       gap: 14px;
       margin-bottom: 20px;
       align-items: end;
@@ -56,37 +57,16 @@
       font-weight: 600;
     }
 
-    input, select, button {
+    input,
+    select {
       width: 100%;
-      border: 1px solid #3a67a0;
-      background: #07163b;
+      border: 1px solid var(--line);
+      background: var(--input);
       color: var(--text);
       border-radius: 16px;
       padding: 14px 16px;
       font-size: 16px;
       outline: none;
-    }
-
-    button {
-      cursor: pointer;
-      font-weight: 700;
-    }
-
-    .action-row {
-      display: flex;
-      gap: 10px;
-    }
-
-    .action-row button {
-      width: auto;
-      min-width: 170px;
-      background: #3b82f6;
-      border-color: #3b82f6;
-    }
-
-    .action-row .ghost {
-      background: #334155;
-      border-color: #334155;
     }
 
     .group-title {
@@ -103,19 +83,23 @@
 
     .card {
       background: #081633;
-      border: 2px solid var(--card-red);
+      border: 2px solid var(--red);
       border-radius: 20px;
       padding: 18px;
       min-height: 150px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: transform .15s ease;
       cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
     }
 
     .card:hover {
       transform: translateY(-2px);
+    }
+
+    .card.copied {
+      box-shadow: 0 0 0 2px rgba(255, 59, 59, 0.22), 0 0 18px rgba(255, 59, 59, 0.28);
     }
 
     .card-top {
@@ -132,10 +116,6 @@
       margin-top: 14px;
     }
 
-    .copied {
-      box-shadow: 0 0 0 2px rgba(255,59,59,.25), 0 0 18px rgba(255,59,59,.25);
-    }
-
     @media (max-width: 1080px) {
       .topbar {
         grid-template-columns: 1fr 1fr;
@@ -146,45 +126,34 @@
       .topbar {
         grid-template-columns: 1fr;
       }
-      .action-row {
-        flex-direction: column;
-      }
-      .action-row button {
-        width: 100%;
-      }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
     <h1>Batch Rename Tool</h1>
-    <div class="sub">เปลี่ยนชื่อและวันที่ครั้งเดียวได้ทุกกลุ่ม และเปลี่ยนประเภทแยกแต่ละกลุ่มได้</div>
+    <div class="sub">เปลี่ยนชื่อและวันที่ครั้งเดียว และกดการ์ดเพื่อคัดลอกได้ทันที</div>
 
     <div class="topbar">
       <div class="field">
-        <label>ชื่อ</label>
+        <label for="baseName">ชื่อ</label>
         <input id="baseName" value="John" />
       </div>
 
       <div class="field">
-        <label>วันที่</label>
+        <label for="dateText">วันที่</label>
         <input id="dateText" value="031126" />
       </div>
 
       <div class="field">
-        <label>ประเภทของ T_</label>
+        <label for="tCategory">ประเภทของ T_</label>
         <select id="tCategory">
-          <option>Cloths</option>
-          <option>Pant</option>
-          <option>Shirt</option>
-          <option>Sock</option>
-          <option>Shoe</option>
+          <option value="Cloths">Cloths</option>
+          <option value="Pant">Pant</option>
+          <option value="Shirt" selected>Shirt</option>
+          <option value="Sock">Sock</option>
+          <option value="Shoe">Shoe</option>
         </select>
-      </div>
-
-      <div class="action-row">
-        <button id="copySelectedBtn">คัดลอกใบที่เลือก</button>
-        <button id="copyAllBtn" class="ghost">คัดลอกทั้งหมด</button>
       </div>
     </div>
 
@@ -200,6 +169,7 @@
 
   <script>
     const categories = ['Cloths', 'Pant', 'Shirt', 'Sock', 'Shoe'];
+
     const mGroup = document.getElementById('mGroup');
     const chGroup = document.getElementById('chGroup');
     const tGroup = document.getElementById('tGroup');
@@ -207,30 +177,68 @@
     const baseNameEl = document.getElementById('baseName');
     const dateTextEl = document.getElementById('dateText');
     const tCategoryEl = document.getElementById('tCategory');
-    const copySelectedBtn = document.getElementById('copySelectedBtn');
-    const copyAllBtn = document.getElementById('copyAllBtn');
 
-    let selectedNames = new Set();
-    let currentData = { M: [], CH: [], T: [] };
+    const currentData = {
+      M: [],
+      CH: [],
+      T: []
+    };
 
     function buildData() {
-      const name = baseNameEl.value.trim() || 'John';
-      const date = dateTextEl.value.trim() || '031126';
-      const tCategory = tCategoryEl.value;
+      const name = (baseNameEl.value || 'John').trim() || 'John';
+      const date = (dateTextEl.value || '031126').trim() || '031126';
+      const tCategory = tCategoryEl.value || 'Shirt';
 
-      currentData.M = categories.map(cat => `M_${name}\n${date}_${cat}`);
-      currentData.CH = categories.map(cat => `CH_${name}\n${date}_${cat}`);
+      currentData.M = categories.map(function(cat) {
+        return 'M_' + name + '\n' + date + '_' + cat;
+      });
+
+      currentData.CH = categories.map(function(cat) {
+        return 'CH_' + name + '\n' + date + '_' + cat;
+      });
+
       currentData.T = [
-        `T_${name}\n${date}_${tCategory}_BC`,
-        `T_${name}\n${date}_${tCategory}_R`,
-        `T_${name}\n${date}_${tCategory}_M`
+        'T_' + name + '\n' + date + '_' + tCategory + '_BC',
+        'T_' + name + '\n' + date + '_' + tCategory + '_N',
+        'T_' + name + '\n' + date + '_' + tCategory + '_R',
+        'T_' + name + '\n' + date + '_' + tCategory + '_M'
       ];
+    }
+
+    function copyText(text) {
+      if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard.writeText(text);
+      }
+
+      return new Promise(function(resolve, reject) {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        textarea.style.pointerEvents = 'none';
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+
+        try {
+          const ok = document.execCommand('copy');
+          document.body.removeChild(textarea);
+          if (ok) {
+            resolve();
+          } else {
+            reject(new Error('copy failed'));
+          }
+        } catch (error) {
+          document.body.removeChild(textarea);
+          reject(error);
+        }
+      });
     }
 
     function createCard(text) {
       const card = document.createElement('div');
       card.className = 'card';
-      if (selectedNames.has(text)) card.classList.add('copied');
 
       const top = document.createElement('div');
       top.className = 'card-top';
@@ -238,60 +246,47 @@
 
       const sub = document.createElement('div');
       sub.className = 'card-sub';
-      sub.textContent = 'คลิกเพื่อเลือกและคัดลอก';
+      sub.textContent = 'คลิกเพื่อคัดลอกทันที';
 
       card.appendChild(top);
       card.appendChild(sub);
 
-      card.addEventListener('click', async () => {
-        if (selectedNames.has(text)) {
-          selectedNames.delete(text);
-          card.classList.remove('copied');
-        } else {
-          selectedNames.add(text);
-          card.classList.add('copied');
-        }
+      card.addEventListener('click', function() {
+        const copyValue = text.replace(/\n/g, '');
+
+        copyText(copyValue)
+          .then(function() {
+            card.classList.add('copied');
+            sub.textContent = 'คัดลอกแล้ว';
+            setTimeout(function() {
+              card.classList.remove('copied');
+              sub.textContent = 'คลิกเพื่อคัดลอกทันที';
+            }, 900);
+          })
+          .catch(function() {
+            sub.textContent = 'คัดลอกไม่สำเร็จ';
+            setTimeout(function() {
+              sub.textContent = 'คลิกเพื่อคัดลอกทันที';
+            }, 1200);
+          });
       });
 
       return card;
     }
 
+    function renderGroup(container, list) {
+      container.innerHTML = '';
+      list.forEach(function(item) {
+        container.appendChild(createCard(item));
+      });
+    }
+
     function render() {
       buildData();
-      mGroup.innerHTML = '';
-      chGroup.innerHTML = '';
-      tGroup.innerHTML = '';
-
-      currentData.M.forEach(item => mGroup.appendChild(createCard(item)));
-      currentData.CH.forEach(item => chGroup.appendChild(createCard(item)));
-      currentData.T.forEach(item => tGroup.appendChild(createCard(item)));
+      renderGroup(mGroup, currentData.M);
+      renderGroup(chGroup, currentData.CH);
+      renderGroup(tGroup, currentData.T);
     }
-
-    async function copyText(text) {
-      try {
-        await navigator.clipboard.writeText(text);
-        alert('คัดลอกเรียบร้อย');
-      } catch (err) {
-        alert('คัดลอกไม่สำเร็จ');
-      }
-    }
-
-    copySelectedBtn.addEventListener('click', () => {
-      const text = [...selectedNames].join('\n\n');
-      if (!text) {
-        alert('ยังไม่ได้เลือกการ์ด');
-        return;
-      }
-      copyText(text.replace(/\n/g, ''));
-    });
-
-    copyAllBtn.addEventListener('click', () => {
-      buildData();
-      const all = [...currentData.M, ...currentData.CH, ...currentData.T]
-        .map(x => x.replace(/\n/g, ''))
-        .join('\n');
-      copyText(all);
-    });
 
     baseNameEl.addEventListener('input', render);
     dateTextEl.addEventListener('input', render);
