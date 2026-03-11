@@ -49,6 +49,14 @@
       align-items: end;
     }
 
+    .topbar-add {
+      display: grid;
+      grid-template-columns: 1fr 180px;
+      gap: 14px;
+      margin-bottom: 20px;
+      align-items: end;
+    }
+
     .field label {
       display: block;
       font-size: 13px;
@@ -58,7 +66,8 @@
     }
 
     input,
-    select {
+    select,
+    button {
       width: 100%;
       border: 1px solid var(--line);
       background: var(--input);
@@ -67,6 +76,11 @@
       padding: 14px 16px;
       font-size: 16px;
       outline: none;
+    }
+
+    button {
+      cursor: pointer;
+      font-weight: 700;
     }
 
     .group-title {
@@ -120,6 +134,10 @@
       .topbar {
         grid-template-columns: 1fr 1fr;
       }
+
+      .topbar-add {
+        grid-template-columns: 1fr;
+      }
     }
 
     @media (max-width: 700px) {
@@ -132,7 +150,7 @@
 <body>
   <div class="wrap">
     <h1>Batch Rename Tool</h1>
-    <div class="sub">เปลี่ยนชื่อและวันที่ครั้งเดียว และกดการ์ดเพื่อคัดลอกได้ทันที</div>
+    <div class="sub">เพิ่มประเภทเองจากหน้าเว็บได้ และกดการ์ดเพื่อคัดลอกได้ทันที</div>
 
     <div class="topbar">
       <div class="field">
@@ -147,13 +165,31 @@
 
       <div class="field">
         <label for="tCategory">ประเภทของ T_</label>
-        <select id="tCategory">
-          <option value="Cloths">Cloths</option>
-          <option value="Pant">Pant</option>
-          <option value="Shirt" selected>Shirt</option>
-          <option value="Sock">Sock</option>
-          <option value="Shoe">Shoe</option>
-        </select>
+        <select id="tCategory"></select>
+      </div>
+    </div>
+
+    <div class="topbar-add">
+      <div class="field">
+        <label for="newCategory">เพิ่มประเภทใหม่</label>
+        <input id="newCategory" placeholder="เช่น Hat หรือ Bag" />
+      </div>
+
+      <div class="field">
+        <label for="addCategoryBtn">เพิ่มเข้ารายการ</label>
+        <button id="addCategoryBtn" type="button">+ เพิ่มประเภท</button>
+      </div>
+    </div>
+
+    <div class="topbar-add">
+      <div class="field">
+        <label for="removeCategory">ลบประเภท</label>
+        <select id="removeCategory"></select>
+      </div>
+
+      <div class="field">
+        <label for="removeCategoryBtn">ลบออกจากรายการ</label>
+        <button id="removeCategoryBtn" type="button">- ลบประเภท</button>
       </div>
     </div>
 
@@ -169,7 +205,8 @@
 
   <script>
     (function () {
-      const categories = ['Cloths', 'Pant', 'Shirt', 'Sock', 'Shoe'];
+      const defaultCategories = ['Cloths', 'Pant', 'Shirt', 'Sock', 'Shoe'];
+      let categories = defaultCategories.slice();
 
       const mGroup = document.getElementById('mGroup');
       const chGroup = document.getElementById('chGroup');
@@ -178,6 +215,10 @@
       const baseNameEl = document.getElementById('baseName');
       const dateTextEl = document.getElementById('dateText');
       const tCategoryEl = document.getElementById('tCategory');
+      const newCategoryEl = document.getElementById('newCategory');
+      const addCategoryBtn = document.getElementById('addCategoryBtn');
+      const removeCategoryEl = document.getElementById('removeCategory');
+      const removeCategoryBtn = document.getElementById('removeCategoryBtn');
 
       const currentData = {
         M: [],
@@ -185,10 +226,88 @@
         T: []
       };
 
+      function renderCategoryOptions() {
+        const currentValue = tCategoryEl.value;
+        const currentRemoveValue = removeCategoryEl.value;
+
+        tCategoryEl.innerHTML = '';
+        removeCategoryEl.innerHTML = '';
+
+        categories.forEach(function (cat) {
+          const option1 = document.createElement('option');
+          option1.value = cat;
+          option1.textContent = cat;
+          tCategoryEl.appendChild(option1);
+
+          const option2 = document.createElement('option');
+          option2.value = cat;
+          option2.textContent = cat;
+          removeCategoryEl.appendChild(option2);
+        });
+
+        if (categories.indexOf(currentValue) >= 0) {
+          tCategoryEl.value = currentValue;
+        } else if (categories.indexOf('Shirt') >= 0) {
+          tCategoryEl.value = 'Shirt';
+        } else if (categories.length > 0) {
+          tCategoryEl.value = categories[0];
+        }
+
+        if (categories.indexOf(currentRemoveValue) >= 0) {
+          removeCategoryEl.value = currentRemoveValue;
+        } else if (categories.length > 0) {
+          removeCategoryEl.value = categories[categories.length - 1];
+        }
+      }
+
+      function addCategory() {
+        const newValue = (newCategoryEl.value || '').trim();
+        if (!newValue) {
+          return;
+        }
+
+        const existing = categories.find(function (cat) {
+          return cat.toLowerCase() === newValue.toLowerCase();
+        });
+
+        if (existing) {
+          tCategoryEl.value = existing;
+          removeCategoryEl.value = existing;
+          newCategoryEl.value = '';
+          render();
+          return;
+        }
+
+        categories.push(newValue);
+        renderCategoryOptions();
+        tCategoryEl.value = newValue;
+        removeCategoryEl.value = newValue;
+        newCategoryEl.value = '';
+        render();
+      }
+
+      function removeCategory() {
+        const valueToRemove = removeCategoryEl.value;
+        if (!valueToRemove) {
+          return;
+        }
+
+        if (categories.length <= 1) {
+          return;
+        }
+
+        categories = categories.filter(function (cat) {
+          return cat !== valueToRemove;
+        });
+
+        renderCategoryOptions();
+        render();
+      }
+
       function buildData() {
         const name = (baseNameEl.value || 'John').trim() || 'John';
         const date = (dateTextEl.value || '031126').trim() || '031126';
-        const tCategory = tCategoryEl.value || 'Shirt';
+        const tCategory = tCategoryEl.value || categories[0] || 'Shirt';
 
         currentData.M = categories.map(function (cat) {
           return 'M_' + name + '_' + '\n' + date + '_' + cat;
@@ -292,7 +411,16 @@
       baseNameEl.addEventListener('input', render);
       dateTextEl.addEventListener('input', render);
       tCategoryEl.addEventListener('change', render);
+      addCategoryBtn.addEventListener('click', addCategory);
+      removeCategoryBtn.addEventListener('click', removeCategory);
+      newCategoryEl.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          addCategory();
+        }
+      });
 
+      renderCategoryOptions();
       render();
     })();
   </script>
