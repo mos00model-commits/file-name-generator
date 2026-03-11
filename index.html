@@ -9,168 +9,205 @@
     body {
       margin: 0;
       font-family: Arial, Helvetica, sans-serif;
-      background: #f4f6f8;
-      color: #1f2937;
+      background: #0b0f14;
+      color: #e5e7eb;
     }
     .wrap {
-      max-width: 760px;
-      margin: 40px auto;
-      background: #ffffff;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      max-width: 1280px;
+      margin: 24px auto;
+      padding: 20px;
+    }
+    .panel {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 18px;
+      padding: 20px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.35);
     }
     h1 {
-      margin: 0 0 12px;
+      margin: 0 0 10px;
       font-size: 28px;
+      color: #f9fafb;
     }
-    p.desc {
-      margin: 0 0 20px;
+    .desc {
+      margin: 0 0 18px;
+      color: #9ca3af;
       line-height: 1.6;
-      color: #4b5563;
     }
-    .grid {
+    .controls {
       display: grid;
-      grid-template-columns: 160px 1fr;
+      grid-template-columns: 180px 1fr;
       gap: 12px 16px;
       align-items: center;
+      margin-bottom: 20px;
     }
     label {
-      font-weight: 600;
+      font-weight: 700;
+      color: #f3f4f6;
     }
     input, select {
       width: 100%;
       padding: 12px 14px;
-      border: 1px solid #d1d5db;
-      border-radius: 10px;
+      border: 1px solid #374151;
+      border-radius: 12px;
       font-size: 16px;
+      background: #0f172a;
+      color: #f9fafb;
     }
     input:focus, select:focus {
       outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(96,165,250,0.18);
     }
     .hint {
       grid-column: 2 / 3;
-      color: #6b7280;
-      font-size: 14px;
       margin-top: -6px;
+      color: #94a3b8;
+      font-size: 14px;
     }
     .actions {
       display: flex;
       gap: 12px;
-      margin-top: 20px;
       flex-wrap: wrap;
+      margin-bottom: 22px;
     }
     button {
       border: none;
-      border-radius: 10px;
+      border-radius: 12px;
       padding: 12px 18px;
       font-size: 15px;
       font-weight: 700;
       cursor: pointer;
     }
     .btn-primary {
-      background: #2563eb;
-      color: #ffffff;
+      background: #3b82f6;
+      color: #fff;
     }
     .btn-secondary {
-      background: #111827;
-      color: #ffffff;
+      background: #374151;
+      color: #fff;
     }
-    .result-box {
-      margin-top: 22px;
-      border: 1px solid #e5e7eb;
-      border-radius: 12px;
-      padding: 16px;
-      background: #f9fafb;
-    }
-    .result-title {
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    .result {
-      font-family: Consolas, monospace;
+    .section-title {
+      margin: 18px 0 12px;
       font-size: 18px;
-      word-break: break-all;
-      color: #111827;
+      font-weight: 700;
+      color: #f9fafb;
+    }
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .grid-5 {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+    }
+    .card {
+      background: #0f172a;
+      border: 2px solid #ef4444;
+      border-radius: 18px;
+      padding: 16px;
+      min-height: 118px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: #f87171;
+      box-shadow: 0 10px 18px rgba(0,0,0,0.28);
+    }
+    .card.active {
+      border-color: #60a5fa;
+      box-shadow: 0 0 0 3px rgba(96,165,250,0.14);
+    }
+    .line1, .line2 {
+      font-family: Consolas, monospace;
+      font-size: 22px;
+      line-height: 1.35;
+      color: #f9fafb;
+      word-break: break-word;
+    }
+    .meta {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #94a3b8;
     }
     .status {
-      margin-top: 12px;
-      color: #2563eb;
-      font-weight: 600;
+      margin-top: 16px;
       min-height: 24px;
+      color: #60a5fa;
+      font-weight: 700;
     }
-    .example {
-      margin-top: 18px;
-      color: #4b5563;
-      line-height: 1.7;
+    @media (max-width: 1100px) {
+      .grid-4, .grid-5 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
-    @media (max-width: 640px) {
-      .wrap { margin: 16px; padding: 18px; }
-      .grid { grid-template-columns: 1fr; }
-      .hint { grid-column: auto; margin-top: -4px; }
+    @media (max-width: 700px) {
+      .controls { grid-template-columns: 1fr; }
+      .hint { grid-column: auto; }
+      .grid-4, .grid-5, .grid-3 { grid-template-columns: 1fr; }
+      .line1, .line2 { font-size: 18px; }
     }
   </style>
 </head>
 <body>
   <div class="wrap">
-    <h1>โปรแกรมเปลี่ยนชื่อไฟล์</h1>
-    <p class="desc">
-      ใช้ชื่อต้นแบบ เช่น <b>M_John_20260311_Cloths_BC</b><br>
-      จากนั้นกรอกชื่อใหม่ วันที่ใหม่ และเลือกประเภท เพื่อให้ระบบแทนที่เฉพาะส่วนนั้นทันที
-    </p>
+    <div class="panel">
+      <h1>โปรแกรมเปลี่ยนชื่อไฟล์</h1>
+      <p class="desc">
+        เปลี่ยนชื่อและวันที่ครั้งเดียว แล้วระบบจะอัปเดตชื่อไฟล์ทุกใบพร้อมกันตามกลุ่ม <b>M</b>, <b>CH</b>, และ <b>T</b>
+      </p>
 
-    <div class="grid">
-      <label for="template">ชื่อต้นแบบ</label>
-      <input id="template" type="text" value="M_John_20260311_Cloths_BC" />
+      <div class="controls">
+        <label for="nameInput">ชื่อใหม่</label>
+        <input id="nameInput" type="text" placeholder="เช่น John" value="John" />
 
-      <label for="newName">ชื่อใหม่</label>
-      <input id="newName" type="text" placeholder="เช่น Mike" />
+        <label for="dateInput">วันที่ใหม่</label>
+        <input id="dateInput" type="text" placeholder="เช่น 20260311" value="20260311" />
+        <div class="hint">แนะนำรูปแบบวันที่: YYYYMMDD เช่น 20260311</div>
 
-      <label for="newDate">วันที่ใหม่</label>
-      <input id="newDate" type="text" placeholder="เช่น 20260320" />
-      <div class="hint">แนะนำรูปแบบวันที่: YYYYMMDD เช่น 20260311</div>
+        <label for="tTypeSelect">ประเภทของ T_</label>
+        <select id="tTypeSelect">
+          <option selected>Cloths</option>
+          <option>Pant</option>
+          <option>Shirt</option>
+          <option>Sock</option>
+          <option>Shoe</option>
+        </select>
+      </div>
 
-      <label for="newType">ประเภท</label>
-      <select id="newType">
-        <option>Cloths</option>
-        <option>Pant</option>
-        <option>Shirt</option>
-        <option>Sock</option>
-        <option>Shoe</option>
-      </select>
-    </div>
+      <div class="actions">
+        <button class="btn-primary" onclick="copySelected()">คัดลอกใบที่เลือก</button>
+        <button class="btn-secondary" onclick="copyAll()">คัดลอกทั้งหมด</button>
+      </div>
 
-    <div class="actions">
-      <button class="btn-primary" onclick="updateResult()">สร้างชื่อไฟล์</button>
-      <button class="btn-secondary" onclick="copyResult()">คัดลอกผลลัพธ์</button>
-    </div>
+      <div class="section-title">กลุ่ม M</div>
+      <div id="mGrid" class="grid-4"></div>
 
-    <div class="result-box">
-      <div class="result-title">ผลลัพธ์</div>
-      <div id="result" class="result">M_John_20260311_Cloths_BC</div>
+      <div class="section-title">กลุ่ม CH</div>
+      <div id="chGrid" class="grid-5"></div>
+
+      <div class="section-title">กลุ่ม T</div>
+      <div id="tGrid" class="grid-3"></div>
+
       <div id="status" class="status"></div>
-    </div>
-
-    <div class="example">
-      ตัวอย่างผลลัพธ์: <br>
-      <b>M_Mike_20260320_Pant_BC</b>
     </div>
   </div>
 
   <script>
-    function parseTemplate(text) {
-      const parts = text.trim().split('_');
-      if (parts.length < 5) return null;
-      return {
-        prefix: parts[0],
-        oldName: parts[1],
-        oldDate: parts[2],
-        oldType: parts[3],
-        suffix: parts[parts.length - 1]
-      };
-    }
+    const mTypes = ['Cloths', 'Shirt', 'Sock', 'Shoe'];
+    const chTypes = ['Pant', 'Cloths', 'Shirt', 'Sock', 'Shoe'];
+    const tSlots = ['N', 'R', 'M'];
+    let selectedValue = '';
 
     function sanitizeName(value) {
       return value.trim().replace(/\s+/g, '').replace(/[^A-Za-z0-9ก-๙_-]/g, '');
@@ -180,53 +217,113 @@
       return value.trim().replace(/[^0-9-]/g, '');
     }
 
-    function updateResult() {
-      const template = document.getElementById('template').value;
-      const newName = document.getElementById('newName').value;
-      const newDate = document.getElementById('newDate').value;
-      const newType = document.getElementById('newType').value;
-      const resultEl = document.getElementById('result');
-      const statusEl = document.getElementById('status');
-
-      const parsed = parseTemplate(template);
-      if (!parsed) {
-        resultEl.textContent = 'รูปแบบชื่อต้นแบบไม่ถูกต้อง';
-        statusEl.textContent = 'ชื่อต้นแบบต้องมีอย่างน้อย 5 ส่วน เช่น M_John_20260311_Cloths_BC';
-        return;
-      }
-
-      const finalName = sanitizeName(newName) || parsed.oldName;
-      const finalDate = sanitizeDate(newDate) || parsed.oldDate;
-      const finalType = newType || parsed.oldType;
-
-      const result = `${parsed.prefix}_${finalName}_${finalDate}_${finalType}_${parsed.suffix}`;
-      resultEl.textContent = result;
-      statusEl.textContent = 'อัปเดตผลลัพธ์แล้ว';
+    function buildTopLine(prefix, name) {
+      return `${prefix}_${name}`;
     }
 
-    async function copyResult() {
-      const text = document.getElementById('result').textContent.trim();
-      const statusEl = document.getElementById('status');
+    function buildBottomLine(date, type, suffix = 'BC') {
+      return `${date}_${type}_${suffix}`;
+    }
 
-      if (!text || text === 'รูปแบบชื่อต้นแบบไม่ถูกต้อง') {
-        statusEl.textContent = 'ยังไม่มีชื่อไฟล์ที่ถูกต้องให้คัดลอก';
+    function buildTBottomLine(date, type, slot) {
+      return `${date}_${type}_${slot}`;
+    }
+
+    function createCard(line1, line2, rawValue) {
+      const btn = document.createElement('button');
+      btn.className = 'card';
+      btn.type = 'button';
+      btn.innerHTML = `
+        <div>
+          <div class="line1">${line1}</div>
+          <div class="line2">${line2}</div>
+        </div>
+        <div class="meta">คลิกเพื่อเลือกใบนี้</div>
+      `;
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.card').forEach(el => el.classList.remove('active'));
+        btn.classList.add('active');
+        selectedValue = rawValue;
+        setStatus(\`เลือกแล้ว: \${rawValue}\`);
+      });
+      return btn;
+    }
+
+    function setStatus(text) {
+      document.getElementById('status').textContent = text;
+    }
+
+    function renderCards() {
+      const name = sanitizeName(document.getElementById('nameInput').value) || 'John';
+      const date = sanitizeDate(document.getElementById('dateInput').value) || '20260311';
+      const tType = document.getElementById('tTypeSelect').value || 'Cloths';
+
+      const mGrid = document.getElementById('mGrid');
+      const chGrid = document.getElementById('chGrid');
+      const tGrid = document.getElementById('tGrid');
+
+      mGrid.innerHTML = '';
+      chGrid.innerHTML = '';
+      tGrid.innerHTML = '';
+      selectedValue = '';
+
+      mTypes.forEach(type => {
+        const line1 = buildTopLine('M', name);
+        const line2 = buildBottomLine(date, type);
+        const raw = `${line1}_${line2}`;
+        mGrid.appendChild(createCard(line1, line2, raw));
+      });
+
+      chTypes.forEach(type => {
+        const line1 = buildTopLine('CH', name);
+        const line2 = buildBottomLine(date, type);
+        const raw = `${line1}_${line2}`;
+        chGrid.appendChild(createCard(line1, line2, raw));
+      });
+
+      tSlots.forEach(slot => {
+        const line1 = buildTopLine('T', name);
+        const line2 = buildTBottomLine(date, tType, slot);
+        const raw = `${line1}_${line2}`;
+        tGrid.appendChild(createCard(line1, line2, raw));
+      });
+
+      setStatus('อัปเดตทุกใบแล้ว');
+    }
+
+    async function copySelected() {
+      if (!selectedValue) {
+        setStatus('ยังไม่ได้เลือกใบที่จะคัดลอก');
         return;
       }
+      try {
+        await navigator.clipboard.writeText(selectedValue);
+        setStatus(`คัดลอกแล้ว: ${selectedValue}`);
+      } catch (err) {
+        setStatus('คัดลอกไม่สำเร็จ');
+      }
+    }
+
+    async function copyAll() {
+      const values = Array.from(document.querySelectorAll('.card')).map(card => {
+        const l1 = card.querySelector('.line1').textContent.trim();
+        const l2 = card.querySelector('.line2').textContent.trim();
+        return `${l1}_${l2}`;
+      });
 
       try {
-        await navigator.clipboard.writeText(text);
-        statusEl.textContent = 'คัดลอกชื่อไฟล์แล้ว';
+        await navigator.clipboard.writeText(values.join('\\n'));
+        setStatus('คัดลอกชื่อไฟล์ทั้งหมดแล้ว');
       } catch (err) {
-        statusEl.textContent = 'คัดลอกไม่สำเร็จ ลองกดสร้างชื่อไฟล์ก่อน';
+        setStatus('คัดลอกทั้งหมดไม่สำเร็จ');
       }
     }
 
-    document.getElementById('template').addEventListener('input', updateResult);
-    document.getElementById('newName').addEventListener('input', updateResult);
-    document.getElementById('newDate').addEventListener('input', updateResult);
-    document.getElementById('newType').addEventListener('change', updateResult);
+    document.getElementById('nameInput').addEventListener('input', renderCards);
+    document.getElementById('dateInput').addEventListener('input', renderCards);
+    document.getElementById('tTypeSelect').addEventListener('change', renderCards);
 
-    updateResult();
+    renderCards();
   </script>
 </body>
 </html>
