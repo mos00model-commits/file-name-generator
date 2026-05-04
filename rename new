@@ -1,0 +1,219 @@
+<script>
+(function(){
+
+const categories=['Cloths','Pant','Shirt','Sock','Shoe'];
+
+const baseNameEl=document.getElementById('baseName');
+const dateTextEl=document.getElementById('dateText');
+const tCategoryEl=document.getElementById('tCategory');
+const historySelect=document.getElementById('historySelect');
+
+const notesContainer=document.getElementById('notesContainer');
+const addNoteBtn=document.getElementById('addNoteBtn');
+
+const mGroup=document.getElementById('mGroup');
+const chGroup=document.getElementById('chGroup');
+const tGroup=document.getElementById('tGroup');
+
+const todayBtn=document.getElementById('todayBtn');
+
+/* CATEGORY */
+categories.forEach(c=>{
+  const op=document.createElement('option');
+  op.value=c;
+  op.textContent=c;
+  tCategoryEl.appendChild(op);
+});
+
+/* DATE */
+function getToday(){
+  const d=new Date();
+  const dd=String(d.getDate()).padStart(2,'0');
+  const mm=String(d.getMonth()+1).padStart(2,'0');
+  const yy=String(d.getFullYear()).slice(-2);
+  return dd+mm+yy;
+}
+
+todayBtn.onclick=()=>{
+  dateTextEl.value=getToday();
+  render();
+  saveHistory();
+};
+
+/* DATA */
+const currentData={M:[],CH:[],T:[]};
+
+function buildData(){
+  const name=baseNameEl.value||'John';
+  const date=dateTextEl.value||getToday();
+  const cat=tCategoryEl.value;
+
+  currentData.M=categories.map((c,i)=>`M_${name}_${date}_${c}_${String(i+1).padStart(3,'0')}`);
+  currentData.CH=categories.map((c,i)=>`CH_${name}_${date}_${c}_${String(i+1).padStart(3,'0')}`);
+  currentData.T=[
+    `T_${name}_${date}_${cat}_BC`,
+    `T_${name}_${date}_${cat}_N`,
+    `T_${name}_${date}_${cat}_R`,
+    `T_${name}_${date}_${cat}_M`
+  ];
+}
+
+/* COPY */
+function copyText(t){
+  navigator.clipboard.writeText(t);
+}
+
+function createCard(text){
+  const d=document.createElement('div');
+  d.className='card';
+  d.textContent=text;
+
+  d.onclick=()=>{
+    copyText(text);
+    d.classList.add('copied');
+    setTimeout(()=>d.classList.remove('copied'),500);
+  };
+
+  return d;
+}
+
+function renderGroup(el,list){
+  el.innerHTML='';
+  list.forEach(i=>el.appendChild(createCard(i)));
+}
+
+/* HISTORY */
+function getHistory(){
+  return JSON.parse(localStorage.getItem('history')||'[]');
+}
+
+function parseDate(str){
+  if(!str || str.length!==6) return 0;
+  const dd=str.slice(0,2);
+  const mm=str.slice(2,4);
+  const yy=str.slice(4,6);
+  return new Date('20'+yy, mm-1, dd);
+}
+
+function saveHistory(){
+  if(!baseNameEl.value || !dateTextEl.value) return;
+
+  let history=getHistory();
+
+  const key=baseNameEl.value+'_'+dateTextEl.value;
+
+  const notes=[...document.querySelectorAll('.note-text')].map(t=>t.value);
+
+  const data={
+    key,
+    name:baseNameEl.value,
+    date:dateTextEl.value,
+    category:tCategoryEl.value,
+    notes
+  };
+
+  const i=history.findIndex(h=>h.key===key);
+  if(i>=0){
+    history[i]=data;
+  }else{
+    history.unshift(data);
+  }
+
+  localStorage.setItem('history',JSON.stringify(history.slice(0,50)));
+  renderHistory();
+}
+
+function renderHistory(){
+  let history=getHistory();
+
+  history.sort((a,b)=>parseDate(b.date)-parseDate(a.date));
+
+  historySelect.innerHTML='';
+
+  history.forEach(h=>{
+    const op=document.createElement('option');
+    op.value=h.key;
+    op.textContent=h.key;
+    historySelect.appendChild(op);
+  });
+
+  // โหลดล่าสุด
+  if(history.length && !historySelect.value){
+    loadHistory(history[0].key);
+  }
+}
+
+function loadHistory(key){
+  const item=getHistory().find(h=>h.key===key);
+  if(!item) return;
+
+  baseNameEl.value=item.name;
+  dateTextEl.value=item.date;
+  tCategoryEl.value=item.category || categories[0];
+
+  notesContainer.innerHTML='';
+  (item.notes||[]).forEach(n=>createNote(n));
+
+  render(false);
+}
+
+historySelect.onchange=()=>{
+  loadHistory(historySelect.value);
+};
+
+/* NOTES */
+function createNote(value){
+  const wrap=document.createElement('div');
+  wrap.className='note-item';
+
+  wrap.innerHTML=`
+    <textarea class="note-text">${value}</textarea>
+    <div class="note-actions">
+      <button class="copy">C</button>
+      <button class="del">X</button>
+    </div>
+  `;
+
+  const textarea=wrap.querySelector('.note-text');
+
+  textarea.oninput=saveHistory;
+
+  wrap.querySelector('.copy').onclick=()=>copyText(textarea.value);
+
+  wrap.querySelector('.del').onclick=()=>{
+    wrap.remove();
+    saveHistory();
+  };
+
+  notesContainer.appendChild(wrap);
+}
+
+addNoteBtn.onclick=()=>{
+  createNote('');
+  saveHistory();
+};
+
+/* INIT */
+if(!dateTextEl.value){
+  dateTextEl.value=getToday();
+}
+
+function render(save=true){
+  buildData();
+  renderGroup(mGroup,currentData.M);
+  renderGroup(chGroup,currentData.CH);
+  renderGroup(tGroup,currentData.T);
+
+  if(save) saveHistory();
+}
+
+baseNameEl.oninput=render;
+dateTextEl.oninput=render;
+tCategoryEl.onchange=render;
+
+/* START */
+renderHistory();
+render();
+
+})();
+</script>
