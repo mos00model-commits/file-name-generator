@@ -3,233 +3,252 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Batch Rename Tool</title>
+<title>MooDeng!!</title>
 
 <style>
 :root{
+  --bg:#f4f6ff;
+  --card:#ffffff;
+  --line:#d6dcff;
+  --primary:#6c8cff;
+  --accent:#ff6b9a;
+  --text:#2b2d42;
+  --muted:#8d99ae;
+}
+
+body.dark{
   --bg:#05070d;
-  --panel:#081633;
-  --input:#07163b;
+  --card:#081633;
   --line:#3a67a0;
+  --primary:#3a67ff;
+  --accent:#ff3b3b;
   --text:#f8fafc;
   --muted:#9fb0c8;
-  --red:#ff3b3b;
 }
 
 body{
   margin:0;
-  font-family:Inter,system-ui,sans-serif;
+  font-family:Inter,system-ui;
   background:var(--bg);
   color:var(--text);
 }
 
-/* ===== BUTTON ===== */
+/* TOP */
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  padding:16px 20px;
+}
+
+.theme-btn{
+  border:none;
+  padding:8px 14px;
+  border-radius:10px;
+  cursor:pointer;
+  background:var(--primary);
+  color:#fff;
+}
+
+/* FLOAT BTN */
 #menuBtn{
   position:fixed;
-  bottom:16px;
-  left:16px;
-  width:44px;
-  height:44px;
-  border-radius:50%;
+  bottom:20px;
+  left:20px;
+  width:52px;
+  height:52px;
   border:none;
-  background:var(--red);
-  color:white;
-  font-size:18px;
+  border-radius:50%;
+  background:var(--accent);
+  color:#fff;
+  font-size:20px;
   cursor:pointer;
+  z-index:1001;
 }
 
-/* ===== SIDEBAR ===== */
-#sidebar{
-  position:fixed;
-  top:0;
-  left:-320px;
-  width:320px;
-  height:100%;
-  background:var(--panel);
-  transition:.3s;
-  z-index:1000;
-  display:flex;
-  flex-direction:column;
-}
-#sidebar.open{left:0;}
-
+/* OVERLAY */
 #overlay{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.5);
+  background:rgba(0,0,0,0.4);
   display:none;
   z-index:999;
 }
-#overlay.show{display:block;}
 
-/* ===== NOTES ===== */
-#notesPanel{
-  flex:1;
-  padding:12px;
-  overflow:auto;
+#overlay.show{
+  display:block;
+}
+
+/* SIDEBAR */
+#sidebar{
+  position:fixed;
+  left:-320px;
+  top:0;
+  width:320px;
+  height:100%;
+  background:var(--card);
+  transition:.3s;
+  z-index:1000;
+}
+
+#sidebar.open{
+  left:0;
 }
 
 .notes-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
   gap:10px;
+  padding:10px;
 }
 
 .note-card{
-  background:#0b1f55;
-  border:2px solid var(--line);
-  border-radius:12px;
-  padding:10px;
-  cursor:pointer;
-  position:relative;
-
-  min-height:80px;
-  max-height:100px;
+  border:2px dashed var(--line);
+  border-radius:10px;
+  padding:8px;
+  font-size:12px;
+  max-height:80px;
   overflow:hidden;
-}
-
-.note-card:hover{
-  border-color:var(--red);
-}
-
-/* 🔥 จำกัดข้อความ */
-.note-text{
-  display:-webkit-box;
-  -webkit-line-clamp:3;
-  -webkit-box-orient:vertical;
-
-  overflow:hidden;
-  text-overflow:ellipsis;
-  white-space:normal;
-  line-height:1.4;
-}
-
-.note-delete{
-  position:absolute;
-  top:4px;
-  right:6px;
   cursor:pointer;
 }
 
-#addNoteBtn{
-  position:absolute;
-  bottom:16px;
-  right:16px;
-  width:46px;
-  height:46px;
-  border-radius:50%;
-  border:none;
-  background:var(--red);
-  color:white;
-  font-size:20px;
-}
-
-/* ===== MAIN CENTER ===== */
+/* MAIN */
 .wrap{
-  max-width:1200px;
-  margin:0 auto;
-  padding:18px 24px;
+  max-width:1100px;
+  margin:auto;
+  padding:20px;
 }
 
-.topbar,.topbar-add{
+/* CONTROL */
+.control{
+  background:var(--card);
+  border-radius:18px;
+  padding:20px;
+  margin-bottom:24px;
+}
+
+.control-grid{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
-  gap:14px;
-  margin-bottom:20px;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
 }
 
-input,select,button{
+label{
+  font-size:13px;
+  color:var(--muted);
+  display:block;
+  margin-bottom:6px;
+}
+
+input,select{
   width:100%;
-  padding:12px;
-  border-radius:12px;
+  padding:16px 18px;
+  border-radius:16px;
   border:1px solid var(--line);
-  background:var(--input);
-  color:white;
+  background:var(--card);
+  color:var(--text);
+  font-size:16px;
 }
 
-/* ===== CARDS ===== */
+/* CATEGORY */
+.category-box{
+  margin-top:16px;
+  display:grid;
+  grid-template-columns:1fr 120px 120px;
+  gap:10px;
+}
+
+.category-box button{
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.add-btn{background:#4caf50;color:#fff;}
+.remove-btn{background:#ff5252;color:#fff;}
+
+/* CARDS */
 .cards{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
   gap:16px;
 }
 
 .card{
-  background:#081633;
-  border:2px solid var(--red);
+  background:var(--card);
+  border-radius:16px;
   padding:14px;
-  border-radius:14px;
   cursor:pointer;
+  transition:.15s;
 }
 
-.card-top{
-  white-space:pre-line;
-  font-size:18px;
-  font-weight:bold;
+.card:hover{
+  transform:translateY(-4px);
 }
 
-.card-sub{
-  font-size:12px;
-  color:var(--muted);
-}
-
-/* ===== CLICK ANIMATION ===== */
-@keyframes tap{
-  0%{transform:scale(1);}
-  50%{transform:scale(0.95);}
-  100%{transform:scale(1);}
-}
-
-.card.tap,
-.note-card.tap{
-  animation:tap .18s ease;
+.copy-btn{
+  margin-top:10px;
+  width:100%;
+  padding:8px;
+  border:none;
+  border-radius:8px;
+  background:var(--primary);
+  color:#fff;
 }
 </style>
 </head>
 
 <body>
 
+<div class="topbar">
+  <h2>🐷 MooDeng!!</h2>
+  <button id="themeBtn" class="theme-btn">🌙</button>
+</div>
+
 <button id="menuBtn">☰</button>
 
+<!-- 🔥 OVERLAY -->
 <div id="overlay"></div>
 
+<!-- SIDEBAR -->
 <div id="sidebar">
   <h3 style="padding:10px;">Notes</h3>
-
-  <div id="notesPanel">
-    <div id="notesContainer" class="notes-grid"></div>
-  </div>
-
-  <button id="addNoteBtn">+</button>
+  <div id="notesContainer" class="notes-grid"></div>
 </div>
 
 <div class="wrap">
 
-<h2>Batch Rename Tool</h2>
+<div class="control">
+  <div class="control-grid">
+    <div>
+      <label>ชื่อ</label>
+      <input id="baseName" value="John">
+    </div>
 
-<div class="topbar">
-  <input id="baseName" value="John">
-  <input id="dateText">
-  <select id="tCategory"></select>
+    <div>
+      <label>วันที่</label>
+      <input id="dateText">
+    </div>
+
+    <div>
+      <label>ประเภท</label>
+      <select id="tCategory"></select>
+    </div>
+  </div>
+
+  <div class="category-box">
+    <input id="newCategory" placeholder="เพิ่ม Cloths / Body / Hat...">
+    <button class="add-btn" id="addCategoryBtn">+ เพิ่ม</button>
+    <button class="remove-btn" id="removeCategoryBtn">- ลบ</button>
+  </div>
 </div>
 
-<div class="topbar-add">
-  <input id="newCategory">
-  <button id="addCategoryBtn">+ เพิ่ม</button>
-</div>
-
-<div class="topbar-add">
-  <select id="removeCategory"></select>
-  <button id="removeCategoryBtn">- ลบ</button>
-</div>
-
-<h3>M</h3>
+<h3>🧥 M</h3>
 <div id="mGroup" class="cards"></div>
 
-<h3>CH</h3>
+<h3>👕 CH</h3>
 <div id="chGroup" class="cards"></div>
 
-<h3>T</h3>
+<h3>🎨 T</h3>
 <div id="tGroup" class="cards"></div>
 
 </div>
@@ -237,165 +256,111 @@ input,select,button{
 <script>
 (function(){
 
-let categories=['Cloths','Pant','Shirt'];
-let notes=JSON.parse(localStorage.getItem('notes'))||[];
+let categories=JSON.parse(localStorage.getItem('categories')) || ['Cloths','Pant','Shirt'];
+let notes=JSON.parse(localStorage.getItem('notes')) || [];
+let theme=localStorage.getItem('theme') || 'cute';
 
-const baseNameEl=document.getElementById('baseName');
-const dateTextEl=document.getElementById('dateText');
-const tCategoryEl=document.getElementById('tCategory');
-const removeCategoryEl=document.getElementById('removeCategory');
+/* THEME */
+function applyTheme(){
+  document.body.classList.toggle('dark',theme==='dark');
+}
+applyTheme();
 
-const mGroup=document.getElementById('mGroup');
-const chGroup=document.getElementById('chGroup');
-const tGroup=document.getElementById('tGroup');
-
-const notesContainer=document.getElementById('notesContainer');
+themeBtn.onclick=()=>{
+  theme = theme==='dark' ? 'cute' : 'dark';
+  localStorage.setItem('theme',theme);
+  applyTheme();
+};
 
 /* DATE */
-function getToday(){
+function today(){
   const d=new Date();
   return String(d.getMonth()+1).padStart(2,'0')+
          String(d.getDate()).padStart(2,'0')+
          String(d.getFullYear()).slice(-2);
 }
-
-let last='';
-setInterval(()=>{
-  const now=getToday();
-  if(now!==last){
-    dateTextEl.value=now;
-    render();
-    last=now;
-  }
-},1000);
+dateText.value=today();
 
 /* CATEGORY */
+function saveCategories(){
+  localStorage.setItem('categories',JSON.stringify(categories));
+}
+
 function renderCategories(){
-  tCategoryEl.innerHTML='';
-  removeCategoryEl.innerHTML='';
+  tCategory.innerHTML='';
   categories.forEach(c=>{
-    tCategoryEl.add(new Option(c,c));
-    removeCategoryEl.add(new Option(c,c));
+    tCategory.add(new Option(c,c));
   });
 }
 
-/* CARD */
-function build(p,c){
-  return p+'_'+baseNameEl.value+'\n'+dateTextEl.value+'_'+c;
-}
+addCategoryBtn.onclick=()=>{
+  let v=newCategory.value.trim();
+  if(!v) return;
 
-function card(text){
+  if(categories.some(c=>c.toLowerCase()===v.toLowerCase())){
+    alert('ซ้ำแล้ว');
+    return;
+  }
+
+  categories.push(v);
+  saveCategories();
+  renderCategories();
+  render();
+  newCategory.value='';
+};
+
+removeCategoryBtn.onclick=()=>{
+  let v=tCategory.value;
+  if(categories.length<=1) return;
+
+  categories=categories.filter(c=>c!==v);
+  saveCategories();
+  renderCategories();
+  render();
+};
+
+/* CARD */
+function createCard(text){
   let d=document.createElement('div');
   d.className='card';
-  d.innerHTML='<div class="card-top">'+text+'</div><div class="card-sub">copy</div>';
+  d.innerHTML=`<div>${text}</div><button class="copy-btn">Copy</button>`;
 
   d.onclick=()=>{
-    d.classList.add('tap');
-    setTimeout(()=>d.classList.remove('tap'),180);
     navigator.clipboard.writeText(text.replace(/\n/g,''));
   };
 
   return d;
 }
 
+/* RENDER */
 function render(){
   mGroup.innerHTML='';
   chGroup.innerHTML='';
   tGroup.innerHTML='';
 
   categories.forEach(c=>{
-    mGroup.appendChild(card(build('M',c)));
-    chGroup.appendChild(card(build('CH',c)));
+    mGroup.appendChild(createCard(`M_${baseName.value}\n${dateText.value}_${c}`));
+    chGroup.appendChild(createCard(`CH_${baseName.value}\n${dateText.value}_${c}`));
   });
 
   ['BC','N','R','M'].forEach(s=>{
-    tGroup.appendChild(card(build('T',tCategoryEl.value)+'_'+s));
+    tGroup.appendChild(createCard(`T_${baseName.value}\n${dateText.value}_${tCategory.value}_${s}`));
   });
 }
 
-/* CATEGORY BTN */
-addCategoryBtn.onclick=()=>{
-  let v=newCategory.value.trim();
-  if(v){categories.push(v);renderCategories();render();}
-};
-
-removeCategoryBtn.onclick=()=>{
-  categories=categories.filter(c=>c!==removeCategoryEl.value);
-  renderCategories();render();
-};
-
-baseNameEl.oninput=render;
-tCategoryEl.onchange=render;
-
 /* NOTES */
-function saveNotes(){
-  localStorage.setItem('notes',JSON.stringify(notes));
-}
-
-let dragIndex=null;
-
 function renderNotes(){
   notesContainer.innerHTML='';
-
-  notes.forEach((n,i)=>{
+  notes.forEach(n=>{
     let d=document.createElement('div');
     d.className='note-card';
-    d.draggable=true;
+    d.textContent=n;
 
-    let txt=document.createElement('div');
-    txt.className='note-text';
-    txt.textContent=n;
-    txt.title=n;
+    d.onclick=()=>navigator.clipboard.writeText(n);
 
-    let del=document.createElement('div');
-    del.className='note-delete';
-    del.textContent='X';
-
-    del.onclick=(e)=>{
-      e.stopPropagation();
-      notes.splice(i,1);
-      saveNotes();
-      renderNotes();
-    };
-
-    d.onclick=()=>{
-      d.classList.add('tap');
-      setTimeout(()=>d.classList.remove('tap'),180);
-      navigator.clipboard.writeText(n);
-    };
-
-    d.ondblclick=(e)=>{
-      e.stopPropagation();
-      let t=prompt('แก้ไขโน้ต',n);
-      if(t!==null){
-        notes[i]=t;
-        saveNotes();
-        renderNotes();
-      }
-    };
-
-    d.ondragstart=()=>dragIndex=i;
-    d.ondragover=(e)=>e.preventDefault();
-    d.ondrop=()=>{
-      const moved=notes.splice(dragIndex,1)[0];
-      notes.splice(i,0,moved);
-      saveNotes();
-      renderNotes();
-    };
-
-    d.append(txt,del);
     notesContainer.appendChild(d);
   });
 }
-
-addNoteBtn.onclick=()=>{
-  let t=prompt('เพิ่มโน้ต');
-  if(t!==null){
-    notes.unshift(t);
-    saveNotes();
-    renderNotes();
-  }
-};
 
 /* SIDEBAR */
 menuBtn.onclick=()=>{
@@ -408,10 +373,18 @@ overlay.onclick=()=>{
   overlay.classList.remove('show');
 };
 
+/* กันคลิกใน sidebar แล้วปิด */
+sidebar.onclick=(e)=>{
+  e.stopPropagation();
+};
+
 /* INIT */
 renderCategories();
 render();
 renderNotes();
+
+baseName.oninput=render;
+tCategory.onchange=render;
 
 })();
 </script>
