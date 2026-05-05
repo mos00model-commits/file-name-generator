@@ -18,26 +18,30 @@
 
 body{
   margin:0;
-  font-family:sans-serif;
+  font-family:Inter,system-ui,sans-serif;
   background:var(--bg);
   color:var(--text);
 }
 
-/* FULL WIDTH */
-.wrap{
-  width:100%;
-  padding:16px;
-}
-
-/* MENU */
+/* ===== FLOAT BUTTON (ล่างซ้าย) ===== */
 #menuBtn{
   position:fixed;
-  top:12px;
-  left:12px;
+  bottom:16px;
+  left:16px;
   z-index:1100;
+
+  width:54px;
+  height:54px;
+  border-radius:50%;
+  font-size:22px;
+  border:none;
+  background:var(--red);
+  color:white;
+  cursor:pointer;
+  box-shadow:0 6px 18px rgba(0,0,0,0.4);
 }
 
-/* DRAWER */
+/* ===== SIDEBAR ===== */
 #sidebar{
   position:fixed;
   top:0;
@@ -55,13 +59,13 @@ body{
 #overlay{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.5);
+  background:rgba(0,0,0,.5);
   display:none;
   z-index:999;
 }
 #overlay.show{display:block;}
 
-/* NOTES */
+/* ===== NOTES ===== */
 #notesPanel{
   flex:1;
   padding:12px;
@@ -83,13 +87,9 @@ body{
   position:relative;
 }
 
-.note-card:hover{
-  border-color:var(--red);
-}
+.note-card:hover{border-color:var(--red);}
 
-.note-text{
-  white-space:pre-wrap;
-}
+.note-text{white-space:pre-wrap;}
 
 .note-delete{
   position:absolute;
@@ -98,7 +98,6 @@ body{
   cursor:pointer;
 }
 
-/* ADD BTN */
 #addNoteBtn{
   position:absolute;
   bottom:16px;
@@ -106,53 +105,70 @@ body{
   width:50px;
   height:50px;
   border-radius:50%;
-  font-size:22px;
+  border:none;
   background:var(--red);
+  color:white;
+  font-size:22px;
+  cursor:pointer;
 }
 
-/* TOOL */
+/* ===== MAIN ===== */
+.wrap{
+  width:100%;
+  padding:18px;
+}
+
 .topbar,.topbar-add{
   display:grid;
-  gap:10px;
-  margin-bottom:12px;
+  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+  gap:14px;
+  margin-bottom:20px;
 }
 
-.topbar{grid-template-columns:repeat(3,1fr);}
-.topbar-add{grid-template-columns:1fr 200px;}
-
 input,select,button{
-  padding:10px;
-  border-radius:10px;
+  width:100%;
+  padding:14px;
+  border-radius:14px;
   border:1px solid var(--line);
   background:var(--input);
   color:white;
 }
 
+/* ===== CARDS ===== */
 .cards{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:10px;
+  grid-template-columns:repeat(auto-fill,minmax(250px,1fr));
+  gap:16px;
 }
 
 .card{
   background:#081633;
   border:2px solid var(--red);
-  padding:10px;
-  border-radius:10px;
+  padding:16px;
+  border-radius:16px;
   cursor:pointer;
 }
 
-.card-top{white-space:pre-line;font-weight:bold;}
-.card-sub{font-size:12px;color:var(--muted);}
+.card-top{
+  white-space:pre-line;
+  font-weight:bold;
+}
+
+.card-sub{
+  font-size:12px;
+  color:var(--muted);
+}
 </style>
 </head>
 
 <body>
 
+<!-- FLOAT BUTTON -->
 <button id="menuBtn">☰</button>
 
 <div id="overlay"></div>
 
+<!-- SIDEBAR -->
 <div id="sidebar">
   <h3 style="padding:10px;">Notes</h3>
 
@@ -163,6 +179,7 @@ input,select,button{
   <button id="addNoteBtn">+</button>
 </div>
 
+<!-- MAIN -->
 <div class="wrap">
 
 <h2>Batch Rename Tool</h2>
@@ -197,7 +214,7 @@ input,select,button{
 <script>
 (function(){
 
-let categories=JSON.parse(localStorage.getItem('cats'))||['Cloths','Pant','Shirt'];
+let categories=['Cloths','Pant','Shirt'];
 let notes=JSON.parse(localStorage.getItem('notes'))||[];
 
 const baseNameEl=document.getElementById('baseName');
@@ -211,7 +228,7 @@ const tGroup=document.getElementById('tGroup');
 
 const notesContainer=document.getElementById('notesContainer');
 
-/* DATE (SMART UPDATE) */
+/* ===== DATE AUTO ===== */
 function getToday(){
   const d=new Date();
   return String(d.getMonth()+1).padStart(2,'0')+
@@ -219,17 +236,17 @@ function getToday(){
          String(d.getFullYear()).slice(-2);
 }
 
-let lastDate='';
+let last='';
 setInterval(()=>{
   const now=getToday();
-  if(now!==lastDate){
+  if(now!==last){
     dateTextEl.value=now;
     render();
-    lastDate=now;
+    last=now;
   }
 },1000);
 
-/* CATEGORY */
+/* ===== CATEGORY ===== */
 function renderCategories(){
   tCategoryEl.innerHTML='';
   removeCategoryEl.innerHTML='';
@@ -239,7 +256,7 @@ function renderCategories(){
   });
 }
 
-/* CARDS */
+/* ===== CARD ===== */
 function build(p,c){
   return p+'_'+baseNameEl.value+'\n'+dateTextEl.value+'_'+c;
 }
@@ -267,7 +284,7 @@ function render(){
   });
 }
 
-/* CATEGORY BTN */
+/* ===== CATEGORY BTN ===== */
 addCategoryBtn.onclick=()=>{
   let v=newCategory.value.trim();
   if(v){categories.push(v);renderCategories();render();}
@@ -281,7 +298,7 @@ removeCategoryBtn.onclick=()=>{
 baseNameEl.oninput=render;
 tCategoryEl.onchange=render;
 
-/* NOTES (drag + edit) */
+/* ===== NOTES ===== */
 function saveNotes(){
   localStorage.setItem('notes',JSON.stringify(notes));
 }
@@ -298,7 +315,7 @@ function renderNotes(){
 
     let txt=document.createElement('div');
     txt.className='note-text';
-    txt.textContent=n||'(empty)';
+    txt.textContent=n;
 
     let del=document.createElement('div');
     del.className='note-delete';
@@ -315,30 +332,19 @@ function renderNotes(){
 
     d.ondblclick=(e)=>{
       e.stopPropagation();
-      let newText=prompt('แก้ไขโน้ต',n);
-      if(newText!==null){
-        notes[i]=newText;
+      let t=prompt('แก้ไขโน้ต',n);
+      if(t!==null){
+        notes[i]=t;
         saveNotes();
         renderNotes();
       }
     };
 
-    d.ondragstart=()=>{
-      dragIndex=i;
-      d.style.opacity=0.5;
-    };
-
-    d.ondragend=()=>d.style.opacity=1;
-
+    d.ondragstart=()=>dragIndex=i;
     d.ondragover=(e)=>e.preventDefault();
-
-    d.ondrop=(e)=>{
-      e.preventDefault();
-      if(dragIndex===i) return;
-
+    d.ondrop=()=>{
       const moved=notes.splice(dragIndex,1)[0];
       notes.splice(i,0,moved);
-
       saveNotes();
       renderNotes();
     };
@@ -349,15 +355,15 @@ function renderNotes(){
 }
 
 addNoteBtn.onclick=()=>{
-  let text=prompt('ใส่ข้อความโน้ต');
-  if(text!==null){
-    notes.unshift(text);
+  let t=prompt('เพิ่มโน้ต');
+  if(t!==null){
+    notes.unshift(t);
     saveNotes();
     renderNotes();
   }
 };
 
-/* DRAWER */
+/* ===== SIDEBAR ===== */
 menuBtn.onclick=()=>{
   sidebar.classList.toggle('open');
   overlay.classList.toggle('show');
@@ -368,7 +374,7 @@ overlay.onclick=()=>{
   overlay.classList.remove('show');
 };
 
-/* INIT */
+/* ===== INIT ===== */
 renderCategories();
 render();
 renderNotes();
