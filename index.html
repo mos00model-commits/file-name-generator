@@ -1,428 +1,371 @@
 <!DOCTYPE html>
 <html lang="th">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Batch Rename Tool</title>
-  <style>
-    :root {
-      --bg: #05070d;
-      --input: #07163b;
-      --line: #3a67a0;
-      --text: #f8fafc;
-      --muted: #9fb0c8;
-      --red: #ff3b3b;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Batch Rename Tool</title>
 
-    * {
-      box-sizing: border-box;
-    }
+<style>
+:root{
+  --bg:#05070d;
+  --panel:#081633;
+  --input:#07163b;
+  --line:#3a67a0;
+  --text:#f8fafc;
+  --muted:#9fb0c8;
+  --red:#ff3b3b;
+}
 
-    body {
-      margin: 0;
-      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: var(--bg);
-      color: var(--text);
-    }
+body{
+  margin:0;
+  font-family:sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
 
-    .wrap {
-      max-width: 1380px;
-      margin: 0 auto;
-      padding: 18px;
-    }
+/* MENU */
+#menuBtn{
+  position:fixed;
+  top:12px;
+  left:12px;
+  z-index:1100;
+}
 
-    h1 {
-      margin: 0 0 8px;
-      font-size: 30px;
-    }
+/* DRAWER */
+#sidebar{
+  position:fixed;
+  top:0;
+  left:-320px;
+  width:320px;
+  height:100%;
+  background:var(--panel);
+  transition:.3s;
+  z-index:1000;
+  display:flex;
+  flex-direction:column;
+}
+#sidebar.open{left:0;}
 
-    .sub {
-      color: var(--muted);
-      margin-bottom: 18px;
-    }
+#overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.5);
+  display:none;
+  z-index:999;
+}
+#overlay.show{display:block;}
 
-    .topbar {
-      display: grid;
-      grid-template-columns: 220px 220px 220px;
-      gap: 14px;
-      margin-bottom: 20px;
-      align-items: end;
-    }
+/* NOTES */
+#notesPanel{
+  flex:1;
+  padding:12px;
+  overflow:auto;
+}
 
-    .topbar-add {
-      display: grid;
-      grid-template-columns: 1fr 180px;
-      gap: 14px;
-      margin-bottom: 20px;
-      align-items: end;
-    }
+.notes-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
 
-    .field label {
-      display: block;
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 7px;
-      font-weight: 600;
-    }
+.note-card{
+  background:#0b1f55;
+  border:2px solid var(--line);
+  border-radius:12px;
+  padding:10px;
+  cursor:pointer;
+  position:relative;
+}
 
-    input,
-    select,
-    button {
-      width: 100%;
-      border: 1px solid var(--line);
-      background: var(--input);
-      color: var(--text);
-      border-radius: 16px;
-      padding: 14px 16px;
-      font-size: 16px;
-      outline: none;
-    }
+.note-card:hover{
+  border-color:var(--red);
+}
 
-    button {
-      cursor: pointer;
-      font-weight: 700;
-    }
+.note-text{
+  white-space:pre-wrap;
+  word-break:break-word;
+}
 
-    .group-title {
-      font-size: 20px;
-      font-weight: 800;
-      margin: 24px 0 12px;
-    }
+.note-delete{
+  position:absolute;
+  top:4px;
+  right:6px;
+  cursor:pointer;
+}
 
-    .cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 16px;
-    }
+/* add button */
+#addNoteBtn{
+  position:absolute;
+  bottom:16px;
+  right:16px;
+  width:50px;
+  height:50px;
+  border-radius:50%;
+  font-size:22px;
+  background:var(--red);
+}
 
-    .card {
-      background: #081633;
-      border: 2px solid var(--red);
-      border-radius: 20px;
-      padding: 18px;
-      min-height: 150px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      cursor: pointer;
-      transition: transform 0.15s ease, box-shadow 0.15s ease;
-    }
+/* MAIN */
+.wrap{padding:16px;}
 
-    .card:hover {
-      transform: translateY(-2px);
-    }
+.topbar,.topbar-add{
+  display:grid;
+  gap:10px;
+  margin-bottom:12px;
+}
 
-    .card.copied {
-      box-shadow: 0 0 0 2px rgba(255, 59, 59, 0.22), 0 0 18px rgba(255, 59, 59, 0.28);
-    }
+.topbar{grid-template-columns:repeat(3,1fr);}
+.topbar-add{grid-template-columns:1fr 200px;}
 
-    .card-top {
-      font-size: 21px;
-      font-weight: 800;
-      line-height: 1.35;
-      white-space: pre-line;
-      word-break: break-word;
-    }
+input,select,button{
+  padding:10px;
+  border-radius:10px;
+  border:1px solid var(--line);
+  background:var(--input);
+  color:white;
+}
 
-    .card-sub {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 14px;
-    }
+.cards{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:10px;
+}
 
-    @media (max-width: 1080px) {
-      .topbar {
-        grid-template-columns: 1fr 1fr;
-      }
+.card{
+  background:#081633;
+  border:2px solid var(--red);
+  padding:10px;
+  border-radius:10px;
+  cursor:pointer;
+}
 
-      .topbar-add {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    @media (max-width: 700px) {
-      .topbar {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+.card-top{white-space:pre-line;font-weight:bold;}
+.card-sub{font-size:12px;color:var(--muted);}
+</style>
 </head>
+
 <body>
-  <div class="wrap">
-    <h1>Batch Rename Tool</h1>
-    <div class="sub">เพิ่มประเภทเองจากหน้าเว็บได้ และกดการ์ดเพื่อคัดลอกได้ทันที</div>
 
-    <div class="topbar">
-      <div class="field">
-        <label for="baseName">ชื่อ</label>
-        <input id="baseName" value="John" />
-      </div>
+<button id="menuBtn">☰</button>
 
-      <div class="field">
-        <label for="dateText">วันที่</label>
-        <input id="dateText" value="031126" />
-      </div>
+<div id="overlay"></div>
 
-      <div class="field">
-        <label for="tCategory">ประเภทของ T_</label>
-        <select id="tCategory"></select>
-      </div>
-    </div>
+<div id="sidebar">
+  <h3 style="padding:10px;">Notes</h3>
 
-    <div class="topbar-add">
-      <div class="field">
-        <label for="newCategory">เพิ่มประเภทใหม่</label>
-        <input id="newCategory" placeholder="เช่น Hat หรือ Bag" />
-      </div>
-
-      <div class="field">
-        <label for="addCategoryBtn">เพิ่มเข้ารายการ</label>
-        <button id="addCategoryBtn" type="button">+ เพิ่มประเภท</button>
-      </div>
-    </div>
-
-    <div class="topbar-add">
-      <div class="field">
-        <label for="removeCategory">ลบประเภท</label>
-        <select id="removeCategory"></select>
-      </div>
-
-      <div class="field">
-        <label for="removeCategoryBtn">ลบออกจากรายการ</label>
-        <button id="removeCategoryBtn" type="button">- ลบประเภท</button>
-      </div>
-    </div>
-
-    <div class="group-title">กลุ่ม M</div>
-    <div class="cards" id="mGroup"></div>
-
-    <div class="group-title">กลุ่ม CH</div>
-    <div class="cards" id="chGroup"></div>
-
-    <div class="group-title">กลุ่ม T</div>
-    <div class="cards" id="tGroup"></div>
+  <div id="notesPanel">
+    <div id="notesContainer" class="notes-grid"></div>
   </div>
 
-  <script>
-    (function () {
-      const defaultCategories = ['Cloths', 'Pant', 'Shirt', 'Sock', 'Shoe'];
-      let categories = defaultCategories.slice();
+  <button id="addNoteBtn">+</button>
+</div>
 
-      const mGroup = document.getElementById('mGroup');
-      const chGroup = document.getElementById('chGroup');
-      const tGroup = document.getElementById('tGroup');
+<div class="wrap">
 
-      const baseNameEl = document.getElementById('baseName');
-      const dateTextEl = document.getElementById('dateText');
-      const tCategoryEl = document.getElementById('tCategory');
-      const newCategoryEl = document.getElementById('newCategory');
-      const addCategoryBtn = document.getElementById('addCategoryBtn');
-      const removeCategoryEl = document.getElementById('removeCategory');
-      const removeCategoryBtn = document.getElementById('removeCategoryBtn');
+<h2>Batch Rename Tool</h2>
 
-      const currentData = {
-        M: [],
-        CH: [],
-        T: []
-      };
+<div class="topbar">
+  <input id="baseName" value="John">
+  <input id="dateText">
+  <select id="tCategory"></select>
+</div>
 
-      function renderCategoryOptions() {
-        const currentValue = tCategoryEl.value;
-        const currentRemoveValue = removeCategoryEl.value;
+<div class="topbar-add">
+  <input id="newCategory">
+  <button id="addCategoryBtn">+ เพิ่ม</button>
+</div>
 
-        tCategoryEl.innerHTML = '';
-        removeCategoryEl.innerHTML = '';
+<div class="topbar-add">
+  <select id="removeCategory"></select>
+  <button id="removeCategoryBtn">- ลบ</button>
+</div>
 
-        categories.forEach(function (cat) {
-          const option1 = document.createElement('option');
-          option1.value = cat;
-          option1.textContent = cat;
-          tCategoryEl.appendChild(option1);
+<h3>M</h3>
+<div id="mGroup" class="cards"></div>
 
-          const option2 = document.createElement('option');
-          option2.value = cat;
-          option2.textContent = cat;
-          removeCategoryEl.appendChild(option2);
-        });
+<h3>CH</h3>
+<div id="chGroup" class="cards"></div>
 
-        if (categories.indexOf(currentValue) >= 0) {
-          tCategoryEl.value = currentValue;
-        } else if (categories.indexOf('Shirt') >= 0) {
-          tCategoryEl.value = 'Shirt';
-        } else if (categories.length > 0) {
-          tCategoryEl.value = categories[0];
-        }
+<h3>T</h3>
+<div id="tGroup" class="cards"></div>
 
-        if (categories.indexOf(currentRemoveValue) >= 0) {
-          removeCategoryEl.value = currentRemoveValue;
-        } else if (categories.length > 0) {
-          removeCategoryEl.value = categories[categories.length - 1];
-        }
+</div>
+
+<script>
+(function(){
+
+let categories=JSON.parse(localStorage.getItem('cats'))||['Cloths','Pant','Shirt'];
+let notes=JSON.parse(localStorage.getItem('notes'))||[];
+
+const baseNameEl=document.getElementById('baseName');
+const dateTextEl=document.getElementById('dateText');
+const tCategoryEl=document.getElementById('tCategory');
+const removeCategoryEl=document.getElementById('removeCategory');
+
+const mGroup=document.getElementById('mGroup');
+const chGroup=document.getElementById('chGroup');
+const tGroup=document.getElementById('tGroup');
+
+const notesContainer=document.getElementById('notesContainer');
+
+/* DATE */
+function getToday(){
+  const d=new Date();
+  return String(d.getMonth()+1).padStart(2,'0')+
+         String(d.getDate()).padStart(2,'0')+
+         String(d.getFullYear()).slice(-2);
+}
+setInterval(()=>dateTextEl.value=getToday(),1000);
+
+/* CATEGORY */
+function renderCategories(){
+  tCategoryEl.innerHTML='';
+  removeCategoryEl.innerHTML='';
+  categories.forEach(c=>{
+    tCategoryEl.add(new Option(c,c));
+    removeCategoryEl.add(new Option(c,c));
+  });
+}
+
+/* CARDS */
+function build(p,c){
+  return p+'_'+baseNameEl.value+'\n'+dateTextEl.value+'_'+c;
+}
+
+function card(text){
+  let d=document.createElement('div');
+  d.className='card';
+  d.innerHTML='<div class="card-top">'+text+'</div><div class="card-sub">copy</div>';
+  d.onclick=()=>navigator.clipboard.writeText(text.replace(/\n/g,''));
+  return d;
+}
+
+function render(){
+  mGroup.innerHTML='';
+  chGroup.innerHTML='';
+  tGroup.innerHTML='';
+
+  categories.forEach(c=>{
+    mGroup.appendChild(card(build('M',c)));
+    chGroup.appendChild(card(build('CH',c)));
+  });
+
+  ['BC','N','R','M'].forEach(s=>{
+    tGroup.appendChild(card(build('T',tCategoryEl.value)+'_'+s));
+  });
+}
+
+/* CATEGORY BTN */
+addCategoryBtn.onclick=()=>{
+  let v=newCategory.value.trim();
+  if(v){categories.push(v);renderCategories();render();}
+};
+
+removeCategoryBtn.onclick=()=>{
+  categories=categories.filter(c=>c!==removeCategoryEl.value);
+  renderCategories();render();
+};
+
+baseNameEl.oninput=render;
+tCategoryEl.onchange=render;
+
+/* NOTES (drag + edit) */
+function saveNotes(){
+  localStorage.setItem('notes',JSON.stringify(notes));
+}
+
+let dragIndex=null;
+
+function renderNotes(){
+  notesContainer.innerHTML='';
+
+  notes.forEach((n,i)=>{
+    let d=document.createElement('div');
+    d.className='note-card';
+    d.draggable=true;
+
+    let txt=document.createElement('div');
+    txt.className='note-text';
+    txt.textContent=n||'(empty)';
+
+    let del=document.createElement('div');
+    del.className='note-delete';
+    del.textContent='X';
+
+    del.onclick=(e)=>{
+      e.stopPropagation();
+      notes.splice(i,1);
+      saveNotes();
+      renderNotes();
+    };
+
+    d.onclick=()=>navigator.clipboard.writeText(n);
+
+    d.ondblclick=(e)=>{
+      e.stopPropagation();
+      let newText=prompt('แก้ไขโน้ต',n);
+      if(newText!==null){
+        notes[i]=newText;
+        saveNotes();
+        renderNotes();
       }
+    };
 
-      function addCategory() {
-        const newValue = (newCategoryEl.value || '').trim();
-        if (!newValue) {
-          return;
-        }
+    d.ondragstart=()=>{
+      dragIndex=i;
+      d.style.opacity=0.5;
+    };
 
-        const existing = categories.find(function (cat) {
-          return cat.toLowerCase() === newValue.toLowerCase();
-        });
+    d.ondragend=()=>d.style.opacity=1;
 
-        if (existing) {
-          tCategoryEl.value = existing;
-          removeCategoryEl.value = existing;
-          newCategoryEl.value = '';
-          render();
-          return;
-        }
+    d.ondragover=(e)=>e.preventDefault();
 
-        categories.push(newValue);
-        renderCategoryOptions();
-        tCategoryEl.value = newValue;
-        removeCategoryEl.value = newValue;
-        newCategoryEl.value = '';
-        render();
-      }
+    d.ondrop=(e)=>{
+      e.preventDefault();
+      if(dragIndex===i) return;
 
-      function removeCategory() {
-        const valueToRemove = removeCategoryEl.value;
-        if (!valueToRemove) {
-          return;
-        }
+      const moved=notes.splice(dragIndex,1)[0];
+      notes.splice(i,0,moved);
 
-        if (categories.length <= 1) {
-          return;
-        }
+      saveNotes();
+      renderNotes();
+    };
 
-        categories = categories.filter(function (cat) {
-          return cat !== valueToRemove;
-        });
+    d.append(txt,del);
+    notesContainer.appendChild(d);
+  });
+}
 
-        renderCategoryOptions();
-        render();
-      }
+addNoteBtn.onclick=()=>{
+  let text=prompt('ใส่ข้อความโน้ต');
+  if(text!==null){
+    notes.unshift(text);
+    saveNotes();
+    renderNotes();
+  }
+};
 
-      function buildData() {
-        const name = (baseNameEl.value || 'John').trim() || 'John';
-        const date = (dateTextEl.value || '031126').trim() || '031126';
-        const tCategory = tCategoryEl.value || categories[0] || 'Shirt';
+/* DRAWER */
+const sidebar=document.getElementById('sidebar');
+const overlay=document.getElementById('overlay');
 
-        currentData.M = categories.map(function (cat) {
-          return 'M_' + name + '_' + '\n' + date + '_' + cat;
-        });
+menuBtn.onclick=()=>{
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('show');
+};
 
-        currentData.CH = categories.map(function (cat) {
-          return 'CH_' + name + '_' + '\n' + date + '_' + cat;
-        });
+overlay.onclick=()=>{
+  sidebar.classList.remove('open');
+  overlay.classList.remove('show');
+};
 
-        currentData.T = [
-          'T_' + name + '_' + '\n' + date + '_' + tCategory + '_BC',
-          'T_' + name + '_' + '\n' + date + '_' + tCategory + '_N',
-          'T_' + name + '_' + '\n' + date + '_' + tCategory + '_R',
-          'T_' + name + '_' + '\n' + date + '_' + tCategory + '_M'
-        ];
-      }
+/* INIT */
+renderCategories();
+render();
+renderNotes();
 
-      function copyText(text) {
-        if (navigator.clipboard && window.isSecureContext) {
-          return navigator.clipboard.writeText(text);
-        }
+})();
+</script>
 
-        return new Promise(function (resolve, reject) {
-          const textarea = document.createElement('textarea');
-          textarea.value = text;
-          textarea.setAttribute('readonly', 'readonly');
-          textarea.style.position = 'fixed';
-          textarea.style.opacity = '0';
-          textarea.style.pointerEvents = 'none';
-          document.body.appendChild(textarea);
-          textarea.focus();
-          textarea.select();
-
-          try {
-            const ok = document.execCommand('copy');
-            document.body.removeChild(textarea);
-            if (ok) {
-              resolve();
-            } else {
-              reject(new Error('copy failed'));
-            }
-          } catch (error) {
-            document.body.removeChild(textarea);
-            reject(error);
-          }
-        });
-      }
-
-      function createCard(text) {
-        const card = document.createElement('div');
-        card.className = 'card';
-
-        const top = document.createElement('div');
-        top.className = 'card-top';
-        top.textContent = text;
-
-        const sub = document.createElement('div');
-        sub.className = 'card-sub';
-        sub.textContent = 'คลิกเพื่อคัดลอกทันที';
-
-        card.appendChild(top);
-        card.appendChild(sub);
-
-        card.addEventListener('click', function () {
-          const copyValue = text.replace(/\n/g, '');
-
-          copyText(copyValue)
-            .then(function () {
-              card.classList.add('copied');
-              sub.textContent = 'คัดลอกแล้ว';
-              setTimeout(function () {
-                card.classList.remove('copied');
-                sub.textContent = 'คลิกเพื่อคัดลอกทันที';
-              }, 900);
-            })
-            .catch(function () {
-              sub.textContent = 'คัดลอกไม่สำเร็จ';
-              setTimeout(function () {
-                sub.textContent = 'คลิกเพื่อคัดลอกทันที';
-              }, 1200);
-            });
-        });
-
-        return card;
-      }
-
-      function renderGroup(container, list) {
-        container.innerHTML = '';
-        list.forEach(function (item) {
-          container.appendChild(createCard(item));
-        });
-      }
-
-      function render() {
-        buildData();
-        renderGroup(mGroup, currentData.M);
-        renderGroup(chGroup, currentData.CH);
-        renderGroup(tGroup, currentData.T);
-      }
-
-      baseNameEl.addEventListener('input', render);
-      dateTextEl.addEventListener('input', render);
-      tCategoryEl.addEventListener('change', render);
-      addCategoryBtn.addEventListener('click', addCategory);
-      removeCategoryBtn.addEventListener('click', removeCategory);
-      newCategoryEl.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') {
-          event.preventDefault();
-          addCategory();
-        }
-      });
-
-      renderCategoryOptions();
-      render();
-    })();
-  </script>
 </body>
 </html>
