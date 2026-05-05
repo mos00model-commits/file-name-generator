@@ -82,9 +82,27 @@ body{
   padding:10px;
   cursor:pointer;
   position:relative;
+
+  min-height:80px;
+  max-height:100px;
+  overflow:hidden;
 }
 
-.note-text{white-space:pre-wrap;}
+.note-card:hover{
+  border-color:var(--red);
+}
+
+/* 🔥 จำกัดข้อความ */
+.note-text{
+  display:-webkit-box;
+  -webkit-line-clamp:3;
+  -webkit-box-orient:vertical;
+
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:normal;
+  line-height:1.4;
+}
 
 .note-delete{
   position:absolute;
@@ -142,7 +160,6 @@ input,select,button{
   padding:14px;
   border-radius:14px;
   cursor:pointer;
-  transition:transform .15s ease;
 }
 
 .card-top{
@@ -178,9 +195,11 @@ input,select,button{
 
 <div id="sidebar">
   <h3 style="padding:10px;">Notes</h3>
+
   <div id="notesPanel">
     <div id="notesContainer" class="notes-grid"></div>
   </div>
+
   <button id="addNoteBtn">+</button>
 </div>
 
@@ -326,6 +345,7 @@ function renderNotes(){
     let txt=document.createElement('div');
     txt.className='note-text';
     txt.textContent=n;
+    txt.title=n;
 
     let del=document.createElement('div');
     del.className='note-delete';
