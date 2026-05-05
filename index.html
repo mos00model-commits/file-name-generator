@@ -23,6 +23,12 @@ body{
   color:var(--text);
 }
 
+/* FULL WIDTH */
+.wrap{
+  width:100%;
+  padding:16px;
+}
+
 /* MENU */
 #menuBtn{
   position:fixed;
@@ -83,7 +89,6 @@ body{
 
 .note-text{
   white-space:pre-wrap;
-  word-break:break-word;
 }
 
 .note-delete{
@@ -93,7 +98,7 @@ body{
   cursor:pointer;
 }
 
-/* add button */
+/* ADD BTN */
 #addNoteBtn{
   position:absolute;
   bottom:16px;
@@ -105,9 +110,7 @@ body{
   background:var(--red);
 }
 
-/* MAIN */
-.wrap{padding:16px;}
-
+/* TOOL */
 .topbar,.topbar-add{
   display:grid;
   gap:10px;
@@ -127,7 +130,7 @@ input,select,button{
 
 .cards{
   display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
   gap:10px;
 }
 
@@ -208,14 +211,23 @@ const tGroup=document.getElementById('tGroup');
 
 const notesContainer=document.getElementById('notesContainer');
 
-/* DATE */
+/* DATE (SMART UPDATE) */
 function getToday(){
   const d=new Date();
   return String(d.getMonth()+1).padStart(2,'0')+
          String(d.getDate()).padStart(2,'0')+
          String(d.getFullYear()).slice(-2);
 }
-setInterval(()=>dateTextEl.value=getToday(),1000);
+
+let lastDate='';
+setInterval(()=>{
+  const now=getToday();
+  if(now!==lastDate){
+    dateTextEl.value=now;
+    render();
+    lastDate=now;
+  }
+},1000);
 
 /* CATEGORY */
 function renderCategories(){
@@ -346,9 +358,6 @@ addNoteBtn.onclick=()=>{
 };
 
 /* DRAWER */
-const sidebar=document.getElementById('sidebar');
-const overlay=document.getElementById('overlay');
-
 menuBtn.onclick=()=>{
   sidebar.classList.toggle('open');
   overlay.classList.toggle('show');
