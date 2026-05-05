@@ -23,12 +23,11 @@ body{
   color:var(--text);
 }
 
-/* ===== FLOAT BUTTON ===== */
+/* ===== BUTTON ===== */
 #menuBtn{
   position:fixed;
   bottom:16px;
   left:16px;
-  z-index:1100;
   width:44px;
   height:44px;
   border-radius:50%;
@@ -85,8 +84,6 @@ body{
   position:relative;
 }
 
-.note-card:hover{border-color:var(--red);}
-
 .note-text{white-space:pre-wrap;}
 
 .note-delete{
@@ -107,12 +104,11 @@ body{
   background:var(--red);
   color:white;
   font-size:20px;
-  cursor:pointer;
 }
 
-/* ===== MAIN (CENTERED) ===== */
+/* ===== MAIN CENTER ===== */
 .wrap{
-  max-width:1200px;   /* 👈 ทำให้การ์ดอยู่กลาง */
+  max-width:1200px;
   margin:0 auto;
   padding:18px 24px;
 }
@@ -146,6 +142,7 @@ input,select,button{
   padding:14px;
   border-radius:14px;
   cursor:pointer;
+  transition:transform .15s ease;
 }
 
 .card-top{
@@ -158,6 +155,18 @@ input,select,button{
   font-size:12px;
   color:var(--muted);
 }
+
+/* ===== CLICK ANIMATION ===== */
+@keyframes tap{
+  0%{transform:scale(1);}
+  50%{transform:scale(0.95);}
+  100%{transform:scale(1);}
+}
+
+.card.tap,
+.note-card.tap{
+  animation:tap .18s ease;
+}
 </style>
 </head>
 
@@ -169,11 +178,9 @@ input,select,button{
 
 <div id="sidebar">
   <h3 style="padding:10px;">Notes</h3>
-
   <div id="notesPanel">
     <div id="notesContainer" class="notes-grid"></div>
   </div>
-
   <button id="addNoteBtn">+</button>
 </div>
 
@@ -262,7 +269,13 @@ function card(text){
   let d=document.createElement('div');
   d.className='card';
   d.innerHTML='<div class="card-top">'+text+'</div><div class="card-sub">copy</div>';
-  d.onclick=()=>navigator.clipboard.writeText(text.replace(/\n/g,''));
+
+  d.onclick=()=>{
+    d.classList.add('tap');
+    setTimeout(()=>d.classList.remove('tap'),180);
+    navigator.clipboard.writeText(text.replace(/\n/g,''));
+  };
+
   return d;
 }
 
@@ -325,7 +338,11 @@ function renderNotes(){
       renderNotes();
     };
 
-    d.onclick=()=>navigator.clipboard.writeText(n);
+    d.onclick=()=>{
+      d.classList.add('tap');
+      setTimeout(()=>d.classList.remove('tap'),180);
+      navigator.clipboard.writeText(n);
+    };
 
     d.ondblclick=(e)=>{
       e.stopPropagation();
