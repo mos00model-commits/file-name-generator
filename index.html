@@ -23,22 +23,20 @@ body{
   color:var(--text);
 }
 
-/* ===== FLOAT BUTTON (ล่างซ้าย) ===== */
+/* ===== FLOAT BUTTON ===== */
 #menuBtn{
   position:fixed;
   bottom:16px;
   left:16px;
   z-index:1100;
-
-  width:54px;
-  height:54px;
+  width:44px;
+  height:44px;
   border-radius:50%;
-  font-size:22px;
   border:none;
   background:var(--red);
   color:white;
+  font-size:18px;
   cursor:pointer;
-  box-shadow:0 6px 18px rgba(0,0,0,0.4);
 }
 
 /* ===== SIDEBAR ===== */
@@ -102,20 +100,21 @@ body{
   position:absolute;
   bottom:16px;
   right:16px;
-  width:50px;
-  height:50px;
+  width:46px;
+  height:46px;
   border-radius:50%;
   border:none;
   background:var(--red);
   color:white;
-  font-size:22px;
+  font-size:20px;
   cursor:pointer;
 }
 
-/* ===== MAIN ===== */
+/* ===== MAIN (CENTERED) ===== */
 .wrap{
-  width:100%;
-  padding:18px;
+  max-width:1200px;   /* 👈 ทำให้การ์ดอยู่กลาง */
+  margin:0 auto;
+  padding:18px 24px;
 }
 
 .topbar,.topbar-add{
@@ -127,8 +126,8 @@ body{
 
 input,select,button{
   width:100%;
-  padding:14px;
-  border-radius:14px;
+  padding:12px;
+  border-radius:12px;
   border:1px solid var(--line);
   background:var(--input);
   color:white;
@@ -144,13 +143,14 @@ input,select,button{
 .card{
   background:#081633;
   border:2px solid var(--red);
-  padding:16px;
-  border-radius:16px;
+  padding:14px;
+  border-radius:14px;
   cursor:pointer;
 }
 
 .card-top{
   white-space:pre-line;
+  font-size:18px;
   font-weight:bold;
 }
 
@@ -163,12 +163,10 @@ input,select,button{
 
 <body>
 
-<!-- FLOAT BUTTON -->
 <button id="menuBtn">☰</button>
 
 <div id="overlay"></div>
 
-<!-- SIDEBAR -->
 <div id="sidebar">
   <h3 style="padding:10px;">Notes</h3>
 
@@ -179,7 +177,6 @@ input,select,button{
   <button id="addNoteBtn">+</button>
 </div>
 
-<!-- MAIN -->
 <div class="wrap">
 
 <h2>Batch Rename Tool</h2>
@@ -228,7 +225,7 @@ const tGroup=document.getElementById('tGroup');
 
 const notesContainer=document.getElementById('notesContainer');
 
-/* ===== DATE AUTO ===== */
+/* DATE */
 function getToday(){
   const d=new Date();
   return String(d.getMonth()+1).padStart(2,'0')+
@@ -246,7 +243,7 @@ setInterval(()=>{
   }
 },1000);
 
-/* ===== CATEGORY ===== */
+/* CATEGORY */
 function renderCategories(){
   tCategoryEl.innerHTML='';
   removeCategoryEl.innerHTML='';
@@ -256,7 +253,7 @@ function renderCategories(){
   });
 }
 
-/* ===== CARD ===== */
+/* CARD */
 function build(p,c){
   return p+'_'+baseNameEl.value+'\n'+dateTextEl.value+'_'+c;
 }
@@ -284,7 +281,7 @@ function render(){
   });
 }
 
-/* ===== CATEGORY BTN ===== */
+/* CATEGORY BTN */
 addCategoryBtn.onclick=()=>{
   let v=newCategory.value.trim();
   if(v){categories.push(v);renderCategories();render();}
@@ -298,7 +295,7 @@ removeCategoryBtn.onclick=()=>{
 baseNameEl.oninput=render;
 tCategoryEl.onchange=render;
 
-/* ===== NOTES ===== */
+/* NOTES */
 function saveNotes(){
   localStorage.setItem('notes',JSON.stringify(notes));
 }
@@ -363,7 +360,7 @@ addNoteBtn.onclick=()=>{
   }
 };
 
-/* ===== SIDEBAR ===== */
+/* SIDEBAR */
 menuBtn.onclick=()=>{
   sidebar.classList.toggle('open');
   overlay.classList.toggle('show');
@@ -374,7 +371,7 @@ overlay.onclick=()=>{
   overlay.classList.remove('show');
 };
 
-/* ===== INIT ===== */
+/* INIT */
 renderCategories();
 render();
 renderNotes();
