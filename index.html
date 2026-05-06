@@ -104,12 +104,13 @@ body{
   cursor:pointer;
 }
 
-/* 🔥 PIN STYLE */
+/* PIN */
 .note-card.pinned{
   border:2px solid gold;
   background:rgba(255,215,0,0.1);
 }
 
+/* NOTE */
 .notes-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -119,12 +120,27 @@ body{
 }
 
 .note-card{
+  position:relative;
   border:2px dashed var(--line);
   border-radius:10px;
   padding:8px;
   font-size:12px;
   max-height:80px;
   overflow:hidden;
+  cursor:pointer;
+}
+
+/* DELETE BTN */
+.delete-btn{
+  position:absolute;
+  top:4px;
+  right:6px;
+  border:none;
+  background:#ff5252;
+  color:#fff;
+  border-radius:6px;
+  font-size:10px;
+  padding:2px 6px;
   cursor:pointer;
 }
 
@@ -191,7 +207,6 @@ input,select{
   border-radius:16px;
   padding:14px;
   cursor:pointer;
-  transition:.1s;
 }
 
 .card:active{
@@ -209,7 +224,6 @@ input,select{
 </div>
 
 <button id="menuBtn">☰</button>
-
 <div id="overlay"></div>
 
 <div id="sidebar">
@@ -217,7 +231,6 @@ input,select{
     <h3>Notes</h3>
     <button id="addNoteBtn" class="add-note-btn">＋</button>
   </div>
-
   <div id="notesContainer" class="notes-grid"></div>
 </div>
 
@@ -299,9 +312,7 @@ function renderCategories(){
 
 addCategoryBtn.onclick=()=>{
   let v=newCategory.value.trim();
-  if(!v) return;
-  if(categories.includes(v)) return;
-
+  if(!v || categories.includes(v)) return;
   categories.push(v);
   saveCategories();
   renderCategories();
@@ -312,7 +323,6 @@ addCategoryBtn.onclick=()=>{
 removeCategoryBtn.onclick=()=>{
   let v=tCategory.value;
   if(categories.length<=1) return;
-
   categories=categories.filter(c=>c!==v);
   saveCategories();
   renderCategories();
@@ -323,15 +333,12 @@ removeCategoryBtn.onclick=()=>{
 function createCard(text){
   let d=document.createElement('div');
   d.className='card';
-
-  let content=document.createElement('div');
-  content.textContent=text;
+  d.textContent=text;
 
   d.onclick=()=>{
     navigator.clipboard.writeText(text.replace(/\n/g,''));
   };
 
-  d.appendChild(content);
   return d;
 }
 
@@ -359,29 +366,50 @@ function saveNotes(){
 function renderNotes(){
   notesContainer.innerHTML='';
 
-  // 🔥 sort pinned first
-  let sorted = [...notes].sort((a,b)=> (b.pinned===true) - (a.pinned===true));
+  let sorted=[...notes].sort((a,b)=> (b.pinned===true)-(a.pinned===true));
 
-  sorted.forEach(n=>{
+  sorted.forEach((n,index)=>{
     let d=document.createElement('div');
     d.className='note-card';
     if(n.pinned) d.classList.add('pinned');
 
-    d.textContent=n.text;
+    let text=document.createElement('div');
+    text.textContent=n.text;
 
-    // copy
+    let del=document.createElement('button');
+    del.className='delete-btn';
+    del.textContent='x';
+
+    del.onclick=(e)=>{
+      e.stopPropagation();
+      if(confirm('ลบโน้ตนี้?')){
+        notes.splice(index,1);
+        saveNotes();
+        renderNotes();
+      }
+    };
+
     d.onclick=()=>{
       navigator.clipboard.writeText(n.text);
     };
 
-    // right click = pin/unpin
-    d.oncontextmenu=(e)=>{
-      e.preventDefault();
-      n.pinned = !n.pinned;
+    d.ondblclick=()=>{
+      let newText=prompt('แก้ไขโน้ต',n.text);
+      if(!newText) return;
+      n.text=newText.trim();
       saveNotes();
       renderNotes();
     };
 
+    d.oncontextmenu=(e)=>{
+      e.preventDefault();
+      n.pinned=!n.pinned;
+      saveNotes();
+      renderNotes();
+    };
+
+    d.appendChild(text);
+    d.appendChild(del);
     notesContainer.appendChild(d);
   });
 }
@@ -390,7 +418,6 @@ function renderNotes(){
 addNoteBtn.onclick=()=>{
   let text=prompt('พิมพ์โน้ต');
   if(!text) return;
-
   notes.unshift({text:text.trim(), pinned:false});
   saveNotes();
   renderNotes();
