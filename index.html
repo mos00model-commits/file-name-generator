@@ -104,13 +104,11 @@ body{
   cursor:pointer;
 }
 
-/* PIN */
 .note-card.pinned{
   border:2px solid gold;
   background:rgba(255,215,0,0.1);
 }
 
-/* NOTE */
 .notes-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -130,7 +128,6 @@ body{
   cursor:pointer;
 }
 
-/* DELETE BTN */
 .delete-btn{
   position:absolute;
   top:4px;
@@ -144,10 +141,13 @@ body{
   cursor:pointer;
 }
 
+/* ✅ แก้ตรงนี้ให้เต็มจอ */
 .wrap{
-  max-width:1100px;
-  margin:auto;
+  max-width:100%;
+  width:100%;
+  margin:0;
   padding:20px;
+  box-sizing:border-box;
 }
 
 .control{
@@ -298,7 +298,6 @@ function today(){
 }
 dateText.value=today();
 
-/* CATEGORY */
 function saveCategories(){
   localStorage.setItem('categories',JSON.stringify(categories));
 }
@@ -329,7 +328,6 @@ removeCategoryBtn.onclick=()=>{
   render();
 };
 
-/* CARD */
 function createCard(text){
   let d=document.createElement('div');
   d.className='card';
@@ -342,7 +340,6 @@ function createCard(text){
   return d;
 }
 
-/* RENDER */
 function render(){
   mGroup.innerHTML='';
   chGroup.innerHTML='';
@@ -358,7 +355,6 @@ function render(){
   });
 }
 
-/* NOTES */
 function saveNotes(){
   localStorage.setItem('notes',JSON.stringify(notes));
 }
@@ -414,7 +410,6 @@ function renderNotes(){
   });
 }
 
-/* ADD NOTE */
 addNoteBtn.onclick=()=>{
   let text=prompt('พิมพ์โน้ต');
   if(!text) return;
@@ -423,7 +418,6 @@ addNoteBtn.onclick=()=>{
   renderNotes();
 };
 
-/* SIDEBAR */
 menuBtn.onclick=()=>{
   sidebar.classList.toggle('open');
   overlay.classList.toggle('show');
@@ -436,7 +430,6 @@ overlay.onclick=()=>{
 
 sidebar.onclick=(e)=>e.stopPropagation();
 
-/* INIT */
 renderCategories();
 render();
 renderNotes();
