@@ -150,7 +150,6 @@ body{
   cursor:pointer;
 }
 
-/* ✅ เว้นขอบซ้ายขวา 5 เซนติเมตร */
 .wrap{
   width:100%;
   margin:0;
@@ -219,6 +218,7 @@ input,select{
 }
 
 .card{
+  position:relative;
   background:var(--card);
   border-radius:16px;
   padding:14px;
@@ -226,6 +226,22 @@ input,select{
   transition:.15s;
   word-break:break-word;
   box-shadow:0 2px 10px rgba(0,0,0,.05);
+  overflow:hidden;
+}
+
+.card::after{
+  content:'';
+  position:absolute;
+  right:10px;
+  bottom:8px;
+  width:42px;
+  height:42px;
+  background-image:var(--icon);
+  background-size:contain;
+  background-repeat:no-repeat;
+  background-position:center;
+  opacity:.16;
+  pointer-events:none;
 }
 
 .card:hover{
@@ -241,7 +257,6 @@ h3{
   margin-top:28px;
 }
 
-/* Mobile */
 @media(max-width:900px){
 
   .wrap{
@@ -333,7 +348,7 @@ h3{
 
 let categories =
 JSON.parse(localStorage.getItem('categories')) ||
-['Cloths','Pant','Shirt'];
+['Cloths','Pant','Shirt','Hat','Shoe'];
 
 let notes =
 JSON.parse(localStorage.getItem('notes')) || [];
@@ -435,6 +450,37 @@ function createCard(text){
 
   d.textContent=text;
 
+  let lastWord =
+  text.split('_').pop().toLowerCase();
+
+  let icon='';
+
+  if(lastWord.includes('shoe'))
+    icon='https://cdn-icons-png.flaticon.com/512/2589/2589903.png';
+
+  else if(lastWord.includes('hat'))
+    icon='https://cdn-icons-png.flaticon.com/512/1974/1974210.png';
+
+  else if(lastWord.includes('shirt'))
+    icon='https://cdn-icons-png.flaticon.com/512/892/892458.png';
+
+  else if(lastWord.includes('pant'))
+    icon='https://cdn-icons-png.flaticon.com/512/863/863684.png';
+
+  else if(lastWord.includes('cloth'))
+    icon='https://cdn-icons-png.flaticon.com/512/892/892458.png';
+
+  else if(lastWord.includes('body'))
+    icon='https://cdn-icons-png.flaticon.com/512/921/921347.png';
+
+  if(icon){
+
+    d.style.setProperty(
+      '--icon',
+      `url(${icon})`
+    );
+  }
+
   d.onclick=()=>{
 
     navigator.clipboard.writeText(
@@ -452,7 +498,6 @@ function render(){
   chGroup.innerHTML='';
   tGroup.innerHTML='';
 
-  /* ✅ M และ CH ไม่มีวันที่ */
   categories.forEach(c=>{
 
     mGroup.appendChild(
@@ -469,7 +514,6 @@ function render(){
 
   });
 
-  /* ✅ T ยังมีวันที่ */
   ['BC','N','R','M'].forEach(s=>{
 
     tGroup.appendChild(
