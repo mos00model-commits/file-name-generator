@@ -232,16 +232,21 @@ input,select{
 .card::after{
   content:'';
   position:absolute;
+
   right:14px;
   top:50%;
   transform:translateY(-50%);
+
   width:52px;
   height:52px;
+
   background-image:var(--icon);
   background-size:contain;
   background-repeat:no-repeat;
   background-position:center;
+
   opacity:.38;
+
   pointer-events:none;
 }
 
@@ -349,17 +354,7 @@ h3{
 
 let categories =
 JSON.parse(localStorage.getItem('categories')) ||
-[
-  'Cloths',
-  'Pant',
-  'Shirt',
-  'Hat',
-  'Shoe',
-  'Body',
-  'Glasses',
-  'Jacket',
-  'Boot'
-];
+['Cloths','Pant','Shirt','Hat','Shoe','Body'];
 
 let notes =
 JSON.parse(localStorage.getItem('notes')) || [];
@@ -467,74 +462,50 @@ function createCard(text){
   text.replace(/\n/g,'_')
       .split('_');
 
-  let category =
-  parts.join(' ').toLowerCase();
+  let category = '';
 
-  /* ---------- SHOE ---------- */
-  if(
-    category.includes('shoe') ||
-    category.includes('boot') ||
-    category.includes('sneaker')
-  ){
-    icon='icons/belt.png';
+  parts.forEach(p=>{
+
+    let v = p.toLowerCase();
+
+    if(
+      v.includes('shoe') ||
+      v.includes('hat') ||
+      v.includes('shirt') ||
+      v.includes('pant') ||
+      v.includes('cloth') ||
+      v.includes('body')
+    ){
+      category = v;
+    }
+
+  });
+
+  if(category.includes('shoe'))
+    icon='https://cdn-icons-png.flaticon.com/512/2589/2589903.png';
+
+  else if(category.includes('hat'))
+    icon='https://cdn-icons-png.flaticon.com/512/744/744502.png';
+
+  else if(category.includes('shirt'))
+    icon='https://cdn-icons-png.flaticon.com/512/892/892458.png';
+
+  else if(category.includes('pant'))
+    icon='https://cdn-icons-png.flaticon.com/512/863/863684.png';
+
+  else if(category.includes('cloth'))
+    icon='https://cdn-icons-png.flaticon.com/512/892/892458.png';
+
+  else if(category.includes('body'))
+    icon='https://cdn-icons-png.flaticon.com/512/921/921347.png';
+
+  if(icon){
+
+    d.style.setProperty(
+      '--icon',
+      `url(${icon})`
+    );
   }
-
-  /* ---------- HAT ---------- */
-  else if(
-    category.includes('hat') ||
-    category.includes('cap') ||
-    category.includes('helmet')
-  ){
-    icon='icons/Hat.png';
-  }
-
-  /* ---------- SHIRT ---------- */
-  else if(
-    category.includes('shirt') ||
-    category.includes('tshirt') ||
-    category.includes('tee') ||
-    category.includes('jacket') ||
-    category.includes('hoodie')
-  ){
-    icon='icons/Shirt.png';
-  }
-
-  /* ---------- PANT ---------- */
-  else if(
-    category.includes('pant') ||
-    category.includes('pants') ||
-    category.includes('jean') ||
-    category.includes('short')
-  ){
-    icon='icons/Pant.png';
-  }
-
-  /* ---------- BODY ---------- */
-  else if(
-    category.includes('body') ||
-    category.includes('skin') ||
-    category.includes('face')
-  ){
-    icon='icons/Body.png';
-  }
-
-  /* ---------- GLASSES ---------- */
-  else if(
-    category.includes('glass') ||
-    category.includes('glasses')
-  ){
-    icon='icons/defaul.png';
-  }
-
-  /* ---------- DEFAULT ---------- */
-  else{
-    icon='https://cdn-icons-png.flaticon.com/512/1077/1077114.png';
-  }
-
-  d.style.setProperty(
-    '--icon',
-    `url(${icon})`
-  );
 
   d.onclick=()=>{
 
