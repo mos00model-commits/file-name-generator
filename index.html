@@ -218,14 +218,31 @@ input,select{
 }
 
 .card{
+  position:relative;
   background:var(--card);
   border-radius:16px;
-  padding:12px;
+  padding:14px 70px 14px 14px;
   cursor:pointer;
   transition:.15s;
   word-break:break-word;
   box-shadow:0 2px 10px rgba(0,0,0,.05);
   overflow:hidden;
+}
+
+.card::after{
+  content:'';
+  position:absolute;
+  right:14px;
+  top:50%;
+  transform:translateY(-50%);
+  width:52px;
+  height:52px;
+  background-image:var(--icon);
+  background-size:contain;
+  background-repeat:no-repeat;
+  background-position:center;
+  opacity:.38;
+  pointer-events:none;
 }
 
 .card:hover{
@@ -235,26 +252,6 @@ input,select{
 .card:active{
   transform:scale(0.96);
   opacity:0.6;
-}
-
-.card-row{
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.card-thumb{
-  width:42px;
-  height:42px;
-  object-fit:cover;
-  border-radius:10px;
-  border:1px solid var(--line);
-  flex-shrink:0;
-}
-
-.card-text{
-  font-size:14px;
-  line-height:1.4;
 }
 
 h3{
@@ -329,7 +326,7 @@ h3{
     </div>
 
     <div class="category-box">
-      <input id="newCategory" placeholder="เพิ่ม Shoe / Pant / Hat...">
+      <input id="newCategory" placeholder="เพิ่ม Cloths / Body / Hat...">
       <button class="add-btn" id="addCategoryBtn">+ เพิ่ม</button>
       <button class="remove-btn" id="removeCategoryBtn">- ลบ</button>
     </div>
@@ -352,7 +349,17 @@ h3{
 
 let categories =
 JSON.parse(localStorage.getItem('categories')) ||
-['Shoe','Pant','Hat'];
+[
+  'Cloths',
+  'Pant',
+  'Shirt',
+  'Hat',
+  'Shoe',
+  'Body',
+  'Glasses',
+  'Jacket',
+  'Boot'
+];
 
 let notes =
 JSON.parse(localStorage.getItem('notes')) || [];
@@ -452,28 +459,82 @@ function createCard(text){
 
   d.className='card';
 
-  // ดึงคำท้าย
-  let lastWord =
-  text.split('_').pop().trim();
+  d.textContent=text;
 
-  // รูปอัตโนมัติ
-  let imgUrl =
-  `https://source.unsplash.com/80x80/?${lastWord}`;
+  let icon='';
 
-  d.innerHTML = `
-    <div class="card-row">
+  let parts =
+  text.replace(/\n/g,'_')
+      .split('_');
 
-      <img
-        class="card-thumb"
-        src="${imgUrl}"
-      >
+  let category =
+  parts.join(' ').toLowerCase();
 
-      <div class="card-text">
-        ${text.replace(/\n/g,'<br>')}
-      </div>
+  /* ---------- SHOE ---------- */
+  if(
+    category.includes('shoe') ||
+    category.includes('boot') ||
+    category.includes('sneaker')
+  ){
+    icon='https://cdn-icons-png.flaticon.com/512/2589/2589903.png';
+  }
 
-    </div>
-  `;
+  /* ---------- HAT ---------- */
+  else if(
+    category.includes('hat') ||
+    category.includes('cap') ||
+    category.includes('helmet')
+  ){
+    icon='https://cdn-icons-png.flaticon.com/512/744/744502.png';
+  }
+
+  /* ---------- SHIRT ---------- */
+  else if(
+    category.includes('shirt') ||
+    category.includes('tshirt') ||
+    category.includes('tee') ||
+    category.includes('jacket') ||
+    category.includes('hoodie')
+  ){
+    icon='https://cdn-icons-png.flaticon.com/512/892/892458.png';
+  }
+
+  /* ---------- PANT ---------- */
+  else if(
+    category.includes('pant') ||
+    category.includes('pants') ||
+    category.includes('jean') ||
+    category.includes('short')
+  ){
+    icon='https://cdn-icons-png.flaticon.com/512/863/863684.png';
+  }
+
+  /* ---------- BODY ---------- */
+  else if(
+    category.includes('body') ||
+    category.includes('skin') ||
+    category.includes('face')
+  ){
+    icon='https://cdn-icons-png.flaticon.com/512/921/921347.png';
+  }
+
+  /* ---------- GLASSES ---------- */
+  else if(
+    category.includes('glass') ||
+    category.includes('glasses')
+  ){
+    icon='https://cdn-icons-png.flaticon.com/512/921/921071.png';
+  }
+
+  /* ---------- DEFAULT ---------- */
+  else{
+    icon='https://cdn-icons-png.flaticon.com/512/1077/1077114.png';
+  }
+
+  d.style.setProperty(
+    '--icon',
+    `url(${icon})`
+  );
 
   d.onclick=()=>{
 
@@ -492,7 +553,6 @@ function render(){
   chGroup.innerHTML='';
   tGroup.innerHTML='';
 
-  // M และ CH ไม่มีวันที่
   categories.forEach(c=>{
 
     mGroup.appendChild(
@@ -509,7 +569,6 @@ function render(){
 
   });
 
-  // T มีวันที่
   ['BC','N','R','M'].forEach(s=>{
 
     tGroup.appendChild(
