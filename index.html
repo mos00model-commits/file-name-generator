@@ -221,7 +221,7 @@ input,select{
   position:relative;
   background:var(--card);
   border-radius:16px;
-  padding:14px;
+  padding:14px 70px 14px 14px;
   cursor:pointer;
   transition:.15s;
   word-break:break-word;
@@ -232,15 +232,21 @@ input,select{
 .card::after{
   content:'';
   position:absolute;
-  right:10px;
-  bottom:8px;
-  width:42px;
-  height:42px;
+
+  right:14px;
+  top:50%;
+  transform:translateY(-50%);
+
+  width:52px;
+  height:52px;
+
   background-image:var(--icon);
   background-size:contain;
   background-repeat:no-repeat;
   background-position:center;
-  opacity:.16;
+
+  opacity:.38;
+
   pointer-events:none;
 }
 
@@ -348,7 +354,7 @@ h3{
 
 let categories =
 JSON.parse(localStorage.getItem('categories')) ||
-['Cloths','Pant','Shirt','Hat','Shoe'];
+['Cloths','Pant','Shirt','Hat','Shoe','Body'];
 
 let notes =
 JSON.parse(localStorage.getItem('notes')) || [];
@@ -450,27 +456,47 @@ function createCard(text){
 
   d.textContent=text;
 
-  let lastWord =
-  text.split('_').pop().toLowerCase();
-
   let icon='';
 
-  if(lastWord.includes('shoe'))
+  let parts =
+  text.replace(/\n/g,'_')
+      .split('_');
+
+  let category = '';
+
+  parts.forEach(p=>{
+
+    let v = p.toLowerCase();
+
+    if(
+      v.includes('shoe') ||
+      v.includes('hat') ||
+      v.includes('shirt') ||
+      v.includes('pant') ||
+      v.includes('cloth') ||
+      v.includes('body')
+    ){
+      category = v;
+    }
+
+  });
+
+  if(category.includes('shoe'))
     icon='https://cdn-icons-png.flaticon.com/512/2589/2589903.png';
 
-  else if(lastWord.includes('hat'))
-    icon='https://cdn-icons-png.flaticon.com/512/1974/1974210.png';
+  else if(category.includes('hat'))
+    icon='https://cdn-icons-png.flaticon.com/512/744/744502.png';
 
-  else if(lastWord.includes('shirt'))
+  else if(category.includes('shirt'))
     icon='https://cdn-icons-png.flaticon.com/512/892/892458.png';
 
-  else if(lastWord.includes('pant'))
+  else if(category.includes('pant'))
     icon='https://cdn-icons-png.flaticon.com/512/863/863684.png';
 
-  else if(lastWord.includes('cloth'))
+  else if(category.includes('cloth'))
     icon='https://cdn-icons-png.flaticon.com/512/892/892458.png';
 
-  else if(lastWord.includes('body'))
+  else if(category.includes('body'))
     icon='https://cdn-icons-png.flaticon.com/512/921/921347.png';
 
   if(icon){
