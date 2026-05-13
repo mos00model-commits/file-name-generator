@@ -150,10 +150,11 @@ body{
   cursor:pointer;
 }
 
+/* ✅ เว้นขอบซ้ายขวา 5 เซนติเมตร */
 .wrap{
   width:100%;
   margin:0;
-  padding:20px;
+  padding:20px 5cm;
   box-sizing:border-box;
 }
 
@@ -240,7 +241,12 @@ h3{
   margin-top:28px;
 }
 
+/* Mobile */
 @media(max-width:900px){
+
+  .wrap{
+    padding:20px;
+  }
 
   .control-grid{
     grid-template-columns:1fr;
